@@ -1,36 +1,26 @@
----
-output: github_document
----
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-
-````{r, echo = FALSE, message = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "README-"
-)
-
-````
-
-## README
+README
+------
 
 This package provides a bootstrap imputation method for dropout events in single-cell RNA-seq data.
 
-## Installation
+Installation
+------------
 
-````{r, message = FALSE}
+``` r
 install.packages("devtools", repos="http://cran.rstudio.com/")
 library(devtools)
 devtools::install_github("seasamgo/rescue")
 library(rescue)
-````
+```
 
-## Method
+Method
+------
 
-`bootstrapImputation` takes a log-normalized expression matrix  and returns a list containing the imputed  and original matrices.
+`bootstrapImputation` takes a log-normalized expression matrix and returns a list containing the imputed and original matrices.
 
-````{r eval = FALSE}
+``` r
 bootstrapImputation(
   expression_matrix,                  # expression matrix
   select_cells = NULL,                # subset cells
@@ -45,7 +35,6 @@ bootstrapImputation(
   return_individual_results = FALSE,  # return sample means
   verbose = FALSE                     # print progress to console
   )
-````
+```
 
 Names of informative genes (e.g. highly variable or differentially expressed genes) may be indicated with `select_genes`. For more, please view the help files.
-
