@@ -29,7 +29,7 @@ bootstrapImputation(
   bootstrap_samples = 100,            # number of samples
   number_pcs = 8,                     # number of PC's to consider
   snn_resolution = 0.9,               # clustering resolution
-  impute_index = NULL,                # specify non-default gene-cell counts
+  impute_index = NULL,                # specify counts to impute, defaults to zero values
   use_mclapply = FALSE,               # run in parallel
   cores = 2,                          # number of parallel cores
   return_individual_results = FALSE,  # return sample means
@@ -37,4 +37,4 @@ bootstrapImputation(
   )
 ```
 
-Names of informative genes (e.g. highly variable or differentially expressed genes) may be indicated with `select_genes`. For more, please view the help files.
+Similar cell types are determined using shared nearest neighbores clustering upon the principal components of informative gene expression (e.g. highly variable or differentially expressed genes). The names of these informative genes may be indicated with `select_genes`, which defaults to all genes. For more, please view the help files.

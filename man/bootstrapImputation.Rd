@@ -2,7 +2,7 @@
 \alias{bootstrapImputation}
 \title{Bootstrap Imputation}
 \description{
-Subsample informative genes, cluster cells using SNN, estimate missing expression values with the distribution mean of means extrapolated from these cell clusterings
+Subsample informative genes, cluster cells by their principal components of gene expression using SNN, estimate missing expression values with the distribution mean of estimated means extrapolated across these cell clusters.
 }
 \usage{
 bootstrapImputation(expression_matrix, select_cells = NULL, select_genes = NULL,
@@ -19,7 +19,7 @@ A gene by cell log-normalized expression matrix.
 Subset cells if desired.
 }
   \item{select_genes}{
-A vector of highly variable of differentially expressed gene names, defaults to all genes.
+A vector of highly variable or differentially expressed gene names, defaults to all genes.
 }
   \item{proportion_genes}{
 Proportion of informative genes to sample.

@@ -4,7 +4,7 @@
 Sample-mean Estimation
 }
 \description{
-Cluster cells using SNN and a list of given genes, estimate missing expression values for each cell-gene combination with the within-cluster non-zero expression mean
+Cluster cells by their principal components of gene expression using SNN and a list of given genes, estimate missing expression values for each cell-gene combination with the within-cluster non-zero expression mean
 }
 \usage{
 sampleImputation(expression_matrix, subset_genes = NULL, scale_data = TRUE,

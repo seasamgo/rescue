@@ -37,7 +37,8 @@ sampleImputation <- function(
   snn_resolution = .9,
   impute_index = NULL,
   pseudo_zero = NULL,
-  verbose = FALSE) {
+  verbose = FALSE
+  ) {
 
 
   # consider only a subset of genes for clustering:
@@ -190,13 +191,14 @@ bootstrapImputation <- function(
   use_mclapply = FALSE,
   cores = 2,
   return_individual_results = FALSE,
-  verbose = FALSE) {
+  verbose = FALSE
+  ) {
 
   if(class(expression_matrix) != 'dgCMatrix') expression_matrix <- methods::as(expression_matrix, 'dgCMatrix')
 
   # test cell subsets
   if(is.null(select_cells)) select_cells = 1:ncol(expression_matrix)
-  else if(verbose == TRUE) cat('subsetting cells \n \n')
+  else if(verbose) cat('subsetting cells \n \n')
   expression_matrix <- expression_matrix[, select_cells]
 
 
@@ -256,7 +258,7 @@ bootstrapImputation <- function(
         verbose = verbose)
 
       result_list[[as.character(round)]] <- temp_impute
-
+      if(verbose) cat('sample ', round, ': \n \n')
     }
   }
 
