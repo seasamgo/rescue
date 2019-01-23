@@ -37,4 +37,4 @@ bootstrapImputation(
   )
 ```
 
-Similar cells are determined with shared nearest neighbores clustering upon the principal components of informative gene expression (e.g. highly variable or differentially expressed genes). The names of these informative genes may be indicated with `select_genes`, which defaults to all genes. For more, please view the help files.
+Similar cells are determined with shared nearest neighbors clustering upon the principal components of informative gene expression (e.g. highly variable or differentially expressed genes). The names of these informative genes may be indicated with `select_genes`, which defaults to all genes. For more, please view the help files.
