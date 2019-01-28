@@ -210,11 +210,32 @@ bootstrapImputation <- function(
   if(is.null(impute_index)) impute_index <- expression_matrix == 0
 
 
-  ## determine gene proportion ##
-  if(!is.null(select_genes))
-    total_number_of_genes <- length(select_genes)
-  else
-    total_number_of_genes <- dim(expression_matrix)[1]
+  ## determine variable genes ##
+  if(!is.null(select_genes)){
+
+    if(verbose) cat('finding variable genes \n \n')
+
+    seurat_object <- methods::new(
+      Class = 'seurat',
+      data = expression_matrix,
+      cell.names = colnames(expression_matrix),
+      meta.data = data.frame(save.name = colnames(expression_matrix))
+    )
+
+    seurat_object <- Seurat::FindVariableGenes(
+      seurat_object,
+      do.plot = FALSE,
+      x.low.cutoff = 0.0125,
+      x.high.cutoff = Inf,
+      y.cutoff = 0.0125,
+      do.recalc = TRUE,
+      display.progress = FALSE
+    )
+    selected_genes <- rownames(seurat_object@hvg.info)[1:min(length(rownames(seurat_object@hvg.info)), 1000)]
+  }
+
+  ## determine number of genes to sample ##
+  total_number_of_genes <- length(select_genes)
   number_of_genes_to_use <- floor(total_number_of_genes*proportion_genes)
 
 
@@ -236,7 +257,8 @@ bootstrapImputation <- function(
         snn_resolution = snn_resolution,
         impute_index = impute_index,
         pseudo_zero = pseudo_zero,
-        verbose = verbose)
+        verbose = verbose
+      )
 
       return(temp_impute)
 
@@ -255,7 +277,8 @@ bootstrapImputation <- function(
         snn_resolution = snn_resolution,
         impute_index = impute_index,
         pseudo_zero = pseudo_zero,
-        verbose = verbose)
+        verbose = verbose
+      )
 
       result_list[[as.character(round)]] <- temp_impute
       if(verbose) cat('sample ', round, ': \n \n')
