@@ -3,7 +3,7 @@
 README
 ------
 
-This package provides a bootstrap imputation method for dropout events in single-cell RNA-seq data.
+This package provides a bootstrap imputation method for dropout events in scRNAseq data.
 
 Installation
 ------------
@@ -38,3 +38,116 @@ bootstrapImputation(
 ```
 
 Similar cells are determined with shared nearest neighbors clustering upon the principal components of informative gene expression (e.g. highly variable or differentially expressed genes). The names of these informative genes may be indicated with `select_genes`, which defaults to the most highly variable. For more, please view the help files.
+
+Example
+-------
+
+To illustrate, we'll need the Splatter package to simulate some scRNAseq data.
+
+``` r
+devtools::install_github("oshlack/splatter")
+library(splatter)
+```
+
+We'll consider a hypothetical example of 500 cells containing five distinct cell types of near equal size and introduce some dropout events.
+
+``` r
+params <- newSplatParams(
+  nGenes = 1e4,
+  batchCells = 500,
+  group.prob = rep(.2, 5),
+  de.prob = .05,
+  dropout.mid = rep(0, 5),
+  dropout.shape = rep(-.5, 5),
+  dropout.type = 'group',
+  seed = 0
+  )
+
+splat <- splatSimulate(params = params, method = 'groups')
+
+cell_types <- colData(splat)$Group
+cell_types <- gsub('Group', 'Cell type ', cell_types)
+```
+
+To visualize this data we'll use the Seurat pipeline, which imports with the rescue package.
+
+``` r
+library(Seurat)
+```
+
+First, we should ensure the comparison only involves genes with counts.
+
+``` r
+counts_true <- assays(splat)$TrueCounts
+counts_dropout <- assays(splat)$counts
+comparable_genes <- rowSums(counts_dropout) != 0
+```
+
+Next, we normalize and scale the data.
+
+``` r
+expression_true <- CreateSeuratObject(
+  raw.data = counts_true[comparable_genes, ], 
+  normalization.method = 'LogNormalize',
+  do.scale = TRUE,
+  do.center = TRUE
+  )
+
+expression_dropout <- CreateSeuratObject(
+  raw.data = counts_dropout[comparable_genes, ], 
+  normalization.method = 'LogNormalize',
+  do.scale = TRUE,
+  do.center = TRUE
+  )
+```
+
+The last step is dimension reduction with PCA and then visualization with t-SNE.
+
+``` r
+expression_true <- RunPCA(
+  expression_true, 
+  pc.genes = rownames(expression_dropout@data), 
+  pcs.print = 0
+  )
+expression_true <- SetIdent(expression_true, ident.use = cell_types)
+expression_true <- RunTSNE(expression_true)
+TSNEPlot(expression_true)
+```
+
+![](README-unnamed-chunk-9-1.png)
+
+``` r
+
+expression_dropout <- RunPCA(
+  expression_dropout, 
+  pc.genes = rownames(expression_dropout@data), 
+  pcs.print = 0
+  )
+expression_dropout <- SetIdent(expression_dropout, ident.use = cell_types)
+expression_dropout <- RunTSNE(expression_dropout)
+TSNEPlot(expression_dropout)
+```
+
+![](README-unnamed-chunk-9-2.png)
+
+It's clear that dropout has distorted our evaluation of the data by cell type as compared to what we should see with the full set of counts. Now let's impute zero counts to recover missing expression values and reevaluate.
+
+``` r
+impute <- bootstrapImputation(expression_matrix = expression_dropout@data)
+
+expression_imputed <- CreateSeuratObject(impute$final_imputation)
+expression_imputed <- NormalizeData(expression_imputed, normalization.method = 'none')
+expression_imputed <- ScaleData(expression_imputed)
+expression_imputed <- RunPCA(
+  expression_imputed, 
+  pc.genes = rownames(expression_dropout@data), 
+  pcs.print = 0
+  )
+expression_imputed <- RunTSNE(expression_imputed)
+expression_imputed <- SetIdent(expression_imputed, ident.use = cell_types)
+TSNEPlot(expression_imputed)
+```
+
+![](README-unnamed-chunk-10-1.png)
+
+The recovery of missing expression values due to dropout events allows us to more correctly distinguish cell types in this simulated example data.

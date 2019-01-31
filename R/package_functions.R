@@ -106,7 +106,7 @@ sampleImputation <- function(
 
     # cells that belong to the cluster
     temp_mat <- expression_matrix[, which(colnames(expression_matrix) %in%  names(clusters[clusters == cluster]))]
-
+    temp_nonzero <- temp_mat != 0
 
     # calculate mean expression and set NaN to 0
     imputed_expr <- Matrix::rowMeans(temp_mat)
@@ -288,7 +288,7 @@ bootstrapImputation <- function(
 
   ## calculate average of bootstrapped sample means ##
   final_imputation <- Reduce('+', result_list)/bootstrap_samples
-  final_imputation <- round(final_imputation, 16)
+  final_imputation <- final_imputation
 
 
   ## return data ##
