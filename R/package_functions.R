@@ -153,7 +153,7 @@ sampleImputation <- function(
 #' @param expression_matrix Row by column log-normalized expression matrix
 #' @param select_cells Subset cells if desired
 #' @param select_genes A vector of highly variable of differentially expressed gene names,
-#' defaults to all genes
+#' defaults to the most variable
 #' @param proportion_genes Proportion of informative genes to sample
 #' @param bootstrap_samples Number of samples for the bootstrap
 #' @param number_pcs Number of dimensions to inform SNN clustering
@@ -211,7 +211,7 @@ bootstrapImputation <- function(
 
 
   ## determine variable genes ##
-  if(!is.null(select_genes)){
+  if(is.null(select_genes)){
 
     if(verbose) cat('finding variable genes \n \n')
 
@@ -231,7 +231,7 @@ bootstrapImputation <- function(
       do.recalc = TRUE,
       display.progress = FALSE
     )
-    selected_genes <- rownames(seurat_object@hvg.info)[1:min(length(rownames(seurat_object@hvg.info)), 1000)]
+    select_genes <- rownames(seurat_object@hvg.info)[1:min(length(rownames(seurat_object@hvg.info)), 1000)]
   }
 
   ## determine number of genes to sample ##
