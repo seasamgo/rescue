@@ -54,14 +54,16 @@ Similar cells are determined with shared nearest neighbors clustering upon the p
 To illustrate, we'll need the Splatter package to simulate some scRNAseq data.
 
 ````{r message = FALSE, warning = FALSE, results = 'hide'}
-devtools::install_github("oshlack/splatter")
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("splatter", version = "3.7")
 library(splatter)
 ````
 
-We'll consider a hypothetical example of 500 cells containing five distinct cell types of near equal size and introduce some dropout events.
+We'll consider a hypothetical example of 500 cells and 10,000 genes containing five distinct cell types of near equal size, then introduce some dropout events.
 
 ````{r message = FALSE, warning = FALSE, results = 'hide'}
-params <- newSplatParams(
+params <- splatter::newSplatParams(
   nGenes = 1e4,
   batchCells = 500,
   group.prob = rep(.2, 5),
@@ -69,12 +71,12 @@ params <- newSplatParams(
   dropout.mid = rep(0, 5),
   dropout.shape = rep(-.5, 5),
   dropout.type = 'group',
-  seed = 0
+  seed = 940
   )
 
-splat <- splatSimulate(params = params, method = 'groups')
+splat <- splatter::splatSimulate(params = params, method = 'groups')
 
-cell_types <- colData(splat)$Group
+cell_types <- SummarizedExperiment::colData(splat)$Group
 cell_types <- gsub('Group', 'Cell type ', cell_types)
 ````
 
@@ -84,70 +86,47 @@ To visualize this data we'll use the Seurat pipeline, which imports with the res
 library(Seurat)
 ````
 
-First, we should ensure the comparison only involves genes with counts.
+First, we should remove genes that lost all counts to dropout.
 
 ````{r message = FALSE, warning = FALSE}
-counts_true <- assays(splat)$TrueCounts
-counts_dropout <- assays(splat)$counts
+counts_true <- SummarizedExperiment::assays(splat)$TrueCounts
+counts_dropout <- SummarizedExperiment::assays(splat)$counts
 comparable_genes <- rowSums(counts_dropout) != 0
 ````
 
 Next, we normalize and scale the data.
 
 ````{r message = FALSE, warning = FALSE}
-expression_true <- CreateSeuratObject(
-  raw.data = counts_true[comparable_genes, ], 
-  normalization.method = 'LogNormalize',
-  do.scale = TRUE,
-  do.center = TRUE
-  )
-
-expression_dropout <- CreateSeuratObject(
-  raw.data = counts_dropout[comparable_genes, ], 
-  normalization.method = 'LogNormalize',
-  do.scale = TRUE,
-  do.center = TRUE
-  )
+expression_true <- Seurat::CreateSeuratObject(raw.data = counts_true, normalization.method = 'LogNormalize', do.scale = TRUE, do.center = TRUE)
+expression_dropout <- Seurat::CreateSeuratObject(raw.data = counts_dropout[comparable_genes, ], normalization.method = 'LogNormalize', do.scale = TRUE, do.center = TRUE)
 ````
 
 The last step is dimension reduction with PCA and then visualization with t-SNE.
 
 ````{r message = FALSE, warning = FALSE}
-expression_true <- RunPCA(
-  expression_true, 
-  pc.genes = rownames(expression_dropout@data), 
-  pcs.print = 0
-  )
-expression_true <- SetIdent(expression_true, ident.use = cell_types)
-expression_true <- RunTSNE(expression_true)
-TSNEPlot(expression_true)
+expression_true <- Seurat::RunPCA(expression_true, pc.genes = rownames(expression_true@data), pcs.print = 0)
+expression_true <- Seurat::SetIdent(expression_true, ident.use = cell_types)
+expression_true <- Seurat::RunTSNE(expression_true)
+Seurat::TSNEPlot(expression_true)
 
-expression_dropout <- RunPCA(
-  expression_dropout, 
-  pc.genes = rownames(expression_dropout@data), 
-  pcs.print = 0
-  )
-expression_dropout <- SetIdent(expression_dropout, ident.use = cell_types)
-expression_dropout <- RunTSNE(expression_dropout)
-TSNEPlot(expression_dropout)
+expression_dropout <- Seurat::RunPCA(expression_dropout, pc.genes = rownames(expression_dropout@data), pcs.print = 0)
+expression_dropout <- Seurat::SetIdent(expression_dropout, ident.use = cell_types)
+expression_dropout <- Seurat::RunTSNE(expression_dropout)
+Seurat::TSNEPlot(expression_dropout)
 ````
 
 It's clear that dropout has distorted our evaluation of the data by cell type as compared to what we should see with the full set of counts. Now let's impute zero counts to recover missing expression values and reevaluate.
 
 ````{r message = FALSE, warning = FALSE}
-impute <- bootstrapImputation(expression_matrix = expression_dropout@data)
+impute <- rescue::bootstrapImputation(expression_matrix = expression_dropout@data, bootstrap_samples = 100, use_mclapply = TRUE, cores = 3)
 
-expression_imputed <- CreateSeuratObject(impute$final_imputation)
-expression_imputed <- NormalizeData(expression_imputed, normalization.method = 'none')
-expression_imputed <- ScaleData(expression_imputed)
-expression_imputed <- RunPCA(
-  expression_imputed, 
-  pc.genes = rownames(expression_dropout@data), 
-  pcs.print = 0
-  )
-expression_imputed <- RunTSNE(expression_imputed)
-expression_imputed <- SetIdent(expression_imputed, ident.use = cell_types)
-TSNEPlot(expression_imputed)
+expression_imputed <- Seurat::CreateSeuratObject(impute$final_imputation)
+expression_imputed <- Seurat::NormalizeData(expression_imputed, normalization.method = 'none')
+expression_imputed <- Seurat::ScaleData(expression_imputed)
+expression_imputed <- Seurat::RunPCA(expression_imputed, pc.genes = rownames(expression_imputed@data), pcs.print = 0)
+expression_imputed <- Seurat::RunTSNE(expression_imputed)
+expression_imputed <- Seurat::SetIdent(expression_imputed, ident.use = cell_types)
+Seurat::TSNEPlot(expression_imputed)
 ````
 
-The recovery of missing expression values due to dropout events allows us to more correctly distinguish cell types in this simulated example data.
+The recovery of missing expression values due to dropout events allows us to correctly distinguish cell types with basic data visualization techniques in this simulated example data.
