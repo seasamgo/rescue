@@ -63,8 +63,8 @@ sampleImputation <- function(
   if(verbose) cat('computing principal components \n \n')
 
   pcs_compute <- min(number_pcs, nrow(x = my_small_matrix_scaled)-1)
-  pca_results <- irlba::irlba(A = Matrix::t(my_small_matrix_scaled), nv = pcs_compute)
-  cell_embeddings <- pca_results$u %*% diag(pca_results$d)
+  pca_results <- irlba::irlba(A = my_small_matrix_scaled, nv = pcs_compute)
+  cell_embeddings <- pca_results$v
   colnames(cell_embeddings) <- paste0('PC',1:number_pcs)
   rownames(cell_embeddings) <- colnames(expression_matrix)
   principal_component_object <- methods::new(
