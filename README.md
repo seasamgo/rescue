@@ -101,7 +101,7 @@ expression_true <- Seurat::RunTSNE(expression_true)
 Seurat::TSNEPlot(expression_true)
 ```
 
-![](README-unnamed-chunk-9-1.png)
+![](man/figures/README-unnamed-chunk-9-1.png)
 
 ``` r
 
@@ -111,7 +111,7 @@ expression_dropout <- Seurat::RunTSNE(expression_dropout)
 Seurat::TSNEPlot(expression_dropout)
 ```
 
-![](README-unnamed-chunk-9-2.png)
+![](man/figures/README-unnamed-chunk-9-2.png)
 
 It's clear that dropout has distorted our evaluation of the data by cell type as compared to what we should see with the full set of counts. Now let's impute zero counts to recover missing expression values and reevaluate.
 
@@ -127,6 +127,6 @@ expression_imputed <- Seurat::SetIdent(expression_imputed, ident.use = cell_type
 Seurat::TSNEPlot(expression_imputed)
 ```
 
-![](README-unnamed-chunk-10-1.png)
+![](man/figures/README-unnamed-chunk-10-1.png)
 
 The recovery of missing expression values due to dropout events allows us to correctly distinguish cell types with basic data visualization techniques in this simulated example data.
