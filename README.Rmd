@@ -27,7 +27,7 @@ This package provides a bootstrap imputation method for dropout events in scRNAs
 
 ## Installation
 
-````{r echo = TRUE, message = FALSE, warning = FALSE, results = 'hide'}
+````{r echo = TRUE, message = FALSE, warning = FALSE, results = 'hide', eval = FALSE}
 install.packages("devtools", repos="http://cran.rstudio.com/")
 library(devtools)
 devtools::install_github("seasamgo/rescue")
@@ -61,7 +61,7 @@ Similar cells are determined with shared nearest neighbors clustering upon the p
 
 To illustrate, we'll need the Splatter package to simulate some scRNAseq data.
 
-````{r message = FALSE, warning = FALSE, results = 'hide'}
+````{r message = FALSE, warning = FALSE, results = 'hide', eval = FALSE}
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 BiocManager::install("splatter", version = "3.7")
@@ -85,7 +85,7 @@ params <- splatter::newSplatParams(
 splat <- splatter::splatSimulate(params = params, method = 'groups')
 
 cell_types <- SummarizedExperiment::colData(splat)$Group
-cell_types <- gsub('Group', 'Cell type ', cell_types)
+cell_types <- as.factor(gsub('Group', 'Cell type ', cell_types))
 ````
 
 To visualize this data we'll use the Seurat pipeline, which imports with the rescue package.
@@ -134,7 +134,6 @@ It's clear that dropout has distorted our evaluation of the data by cell type as
 impute <- rescue::bootstrapImputation(expression_matrix = expression_dropout@assays$RNA@data, bootstrap_samples = 100, use_mclapply = TRUE, cores = 3)
 
 expression_imputed <- Seurat::CreateSeuratObject(counts = impute$final_imputation)
-#expression_imputed <- Seurat::NormalizeData(expression_imputed, normalization.method = 'none')
 expression_imputed <- Seurat::ScaleData(expression_imputed)
 expression_imputed <- Seurat::RunPCA(expression_imputed, features = rownames(expression_imputed), verbose = FALSE)
 expression_imputed <- Seurat::SetIdent(expression_imputed, value = cell_types)

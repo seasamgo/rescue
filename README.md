@@ -5,14 +5,14 @@ README
 
 This package provides a bootstrap imputation method for dropout events in scRNAseq data.
 
-News
+NEWS
 ----
 
-> Aug. 14, 2019  
+> Aug. 14, 2019
 
-- Version 0.1.1 released!  
-- Compatible with Seurat v3.  
-- Informative genes may be determined using any pipeline (e.g. scran) or method and indicated with `select_genes`.  
+-   Version 0.1.1 released!
+-   Compatible with Seurat v3.
+-   Informative genes may be determined using any pipeline (e.g. scran) or method and indicated with `select_genes`.
 
 Installation
 ------------
@@ -77,7 +77,7 @@ params <- splatter::newSplatParams(
 splat <- splatter::splatSimulate(params = params, method = 'groups')
 
 cell_types <- SummarizedExperiment::colData(splat)$Group
-cell_types <- gsub('Group', 'Cell type ', cell_types)
+cell_types <- as.factor(gsub('Group', 'Cell type ', cell_types))
 ```
 
 To visualize this data we'll use the Seurat pipeline, which imports with the rescue package.
@@ -133,7 +133,6 @@ It's clear that dropout has distorted our evaluation of the data by cell type as
 impute <- rescue::bootstrapImputation(expression_matrix = expression_dropout@assays$RNA@data, bootstrap_samples = 100, use_mclapply = TRUE, cores = 3)
 
 expression_imputed <- Seurat::CreateSeuratObject(counts = impute$final_imputation)
-#expression_imputed <- Seurat::NormalizeData(expression_imputed, normalization.method = 'none')
 expression_imputed <- Seurat::ScaleData(expression_imputed)
 expression_imputed <- Seurat::RunPCA(expression_imputed, features = rownames(expression_imputed), verbose = FALSE)
 expression_imputed <- Seurat::SetIdent(expression_imputed, value = cell_types)
