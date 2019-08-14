@@ -2,13 +2,14 @@ Package: rescue
 Type: Package
 Title: Bootstrap imputation for single-cell RNA-seq data
 Version: 0.1.1
-Date: 2019-01-21
+Date: 2019-08-14
 Author: Sam Tracy & Ruben Dries
 Maintainer: Sam Tracy <stracy@g.harvard.edu>
 Description: Given a log-transformed expression matrix and list of informative genes: 
-    subsamples informative genes, clusters samples using SNN clustering, estimates missing 
+    subsample informative genes, cluster samples using SNN clustering, estimate missing 
     expression values with the distribution mean of means extrapolated from these cell 
-    clusterings, and returns an imputed expression matrix.
+    clusterings, and return an imputed expression matrix. See Tracy, S., Dries, R., and 
+    Yuan, G.C. (2019) <doi:10.1186/s12859-019-2977-0> for more details.
 Depends:
     R (>= 3.4.0)
 Imports:

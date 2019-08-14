@@ -3,7 +3,7 @@
 README
 ------
 
-This package provides a bootstrap imputation method for dropout events in scRNAseq data.
+This package provides a bootstrap imputation method for dropout events in scRNAseq data published [here](https://doi.org/10.1186/s12859-019-2977-0).  
 
 NEWS
 ----
