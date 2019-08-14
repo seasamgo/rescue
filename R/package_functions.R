@@ -68,9 +68,9 @@ sampleImputation <- function(
   colnames(cell_embeddings) <- paste0('PC',1:number_pcs)
   rownames(cell_embeddings) <- colnames(expression_matrix)
   principal_component_object <- methods::new(
-    Class = 'dim.reduction',
+    Class = 'DimReduc',
     cell.embeddings = cell_embeddings,
-    key = 'PC'
+    key = 'PC_'
   )
 
 
@@ -78,23 +78,37 @@ sampleImputation <- function(
   if(verbose) cat('searching shared nearest neighbors \n \n')
 
   seurat_object <- methods::new(
-    Class = 'seurat',
-    data = my_small_matrix,
-    scale.data = my_small_matrix_scaled,
-    cell.names = colnames(my_small_matrix),
-    meta.data = data.frame(save.name = colnames(my_small_matrix))
+    Class = 'Seurat',
+    assays = list(
+      RNA = new(
+        Class = 'Assay',
+        data = my_small_matrix,
+        scale.data = as(my_small_matrix_scaled, 'matrix')
+      )
+    ),
+    active.assay = 'RNA',
+    active.ident = as.factor(colnames(my_small_matrix)),
+    version = packageVersion(pkg = 'Seurat')
   )
-  seurat_object@dr$pca <- principal_component_object
+
+  seurat_object@reductions$pca <- principal_component_object
+
+  seurat_object <- Seurat::FindNeighbors(
+    seurat_object,
+    verbose = FALSE,
+    dims = 1:number_pcs
+  )
 
   seurat_object <- Seurat::FindClusters(
     object = seurat_object,
-    dims.use = 1:number_pcs,
-    print.output = FALSE,
+    verbose = FALSE,
     resolution = snn_resolution
   )
 
-  clusters <- seurat_object@ident
+  clusters <- seurat_object@active.ident
   names(clusters) <- colnames(expression_matrix)
+
+  remove(seurat_object)
 
   ## IMPUTATION step ##
   impute_result_list <- list()
@@ -215,23 +229,15 @@ bootstrapImputation <- function(
 
     if(verbose) cat('finding variable genes \n \n')
 
-    seurat_object <- methods::new(
-      Class = 'seurat',
-      data = expression_matrix,
-      cell.names = colnames(expression_matrix),
-      meta.data = data.frame(save.name = colnames(expression_matrix))
-    )
+    seurat_object <- Seurat::CreateSeuratObject(counts = expression_matrix)
 
-    seurat_object <- Seurat::FindVariableGenes(
-      seurat_object,
-      do.plot = FALSE,
-      x.low.cutoff = 0.0125,
-      x.high.cutoff = Inf,
-      y.cutoff = 0.0125,
-      do.recalc = TRUE,
-      display.progress = FALSE
+    seurat_object <- Seurat::FindVariableFeatures(seurat_object,
+      nfeatures = 1000,
+      mean.cutoff = c(.0125, Inf),
+      dispersion.cutoff = c(.0125, Inf),
+      verbose = FALSE
     )
-    select_genes <- rownames(seurat_object@hvg.info)[1:min(length(rownames(seurat_object@hvg.info)), 1000)]
+    select_genes <- seurat_object@assays$RNA@var.features
   }
 
   ## determine number of genes to sample ##

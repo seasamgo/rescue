@@ -17,6 +17,14 @@ knitr::opts_chunk$set(
 
 This package provides a bootstrap imputation method for dropout events in scRNAseq data.
 
+## NEWS
+
+> Aug. 14, 2019  
+
+- Version 0.1.1 released!  
+- Compatible with Seurat v3.  
+- Informative genes may be determined using any pipeline (e.g. scran) or method and indicated with `select_genes`.  
+
 ## Installation
 
 ````{r echo = TRUE, message = FALSE, warning = FALSE, results = 'hide'}
@@ -97,36 +105,41 @@ comparable_genes <- rowSums(counts_dropout) != 0
 Next, we normalize and scale the data.
 
 ````{r message = FALSE, warning = FALSE}
-expression_true <- Seurat::CreateSeuratObject(raw.data = counts_true, normalization.method = 'LogNormalize', do.scale = TRUE, do.center = TRUE)
-expression_dropout <- Seurat::CreateSeuratObject(raw.data = counts_dropout[comparable_genes, ], normalization.method = 'LogNormalize', do.scale = TRUE, do.center = TRUE)
+expression_true <- Seurat::CreateSeuratObject(counts = counts_true)
+expression_true <- Seurat::NormalizeData(expression_true)
+expression_true <- ScaleData(expression_true, features = rownames(expression_true))
+
+expression_dropout <- Seurat::CreateSeuratObject(counts = counts_dropout[comparable_genes, ])
+expression_dropout <- Seurat::NormalizeData(expression_dropout)
+expression_dropout <- ScaleData(expression_dropout, features = rownames(expression_dropout))
 ````
 
 The last step is dimension reduction with PCA and then visualization with t-SNE.
 
 ````{r message = FALSE, warning = FALSE}
-expression_true <- Seurat::RunPCA(expression_true, pc.genes = rownames(expression_true@data), pcs.print = 0)
-expression_true <- Seurat::SetIdent(expression_true, ident.use = cell_types)
+expression_true <- Seurat::RunPCA(expression_true, features = rownames(expression_true), verbose = FALSE)
+expression_true <- Seurat::SetIdent(expression_true, value = cell_types)
 expression_true <- Seurat::RunTSNE(expression_true)
-Seurat::TSNEPlot(expression_true)
+Seurat::DimPlot(expression_true, reduction = "tsne")
 
-expression_dropout <- Seurat::RunPCA(expression_dropout, pc.genes = rownames(expression_dropout@data), pcs.print = 0)
-expression_dropout <- Seurat::SetIdent(expression_dropout, ident.use = cell_types)
+expression_dropout <- Seurat::RunPCA(expression_dropout, features = rownames(expression_dropout), verbose = FALSE)
+expression_dropout <- Seurat::SetIdent(expression_dropout, value = cell_types)
 expression_dropout <- Seurat::RunTSNE(expression_dropout)
-Seurat::TSNEPlot(expression_dropout)
+Seurat::DimPlot(expression_dropout, reduction = "tsne")
 ````
 
 It's clear that dropout has distorted our evaluation of the data by cell type as compared to what we should see with the full set of counts. Now let's impute zero counts to recover missing expression values and reevaluate.
 
 ````{r message = FALSE, warning = FALSE}
-impute <- rescue::bootstrapImputation(expression_matrix = expression_dropout@data, bootstrap_samples = 100, use_mclapply = TRUE, cores = 3)
+impute <- rescue::bootstrapImputation(expression_matrix = expression_dropout@assays$RNA@data, bootstrap_samples = 100, use_mclapply = TRUE, cores = 3)
 
-expression_imputed <- Seurat::CreateSeuratObject(impute$final_imputation)
-expression_imputed <- Seurat::NormalizeData(expression_imputed, normalization.method = 'none')
+expression_imputed <- Seurat::CreateSeuratObject(counts = impute$final_imputation)
+#expression_imputed <- Seurat::NormalizeData(expression_imputed, normalization.method = 'none')
 expression_imputed <- Seurat::ScaleData(expression_imputed)
-expression_imputed <- Seurat::RunPCA(expression_imputed, pc.genes = rownames(expression_imputed@data), pcs.print = 0)
+expression_imputed <- Seurat::RunPCA(expression_imputed, features = rownames(expression_imputed), verbose = FALSE)
+expression_imputed <- Seurat::SetIdent(expression_imputed, value = cell_types)
 expression_imputed <- Seurat::RunTSNE(expression_imputed)
-expression_imputed <- Seurat::SetIdent(expression_imputed, ident.use = cell_types)
-Seurat::TSNEPlot(expression_imputed)
+Seurat::DimPlot(expression_imputed, reduction = "tsne")
 ````
 
 The recovery of missing expression values due to dropout events allows us to correctly distinguish cell types with basic data visualization techniques in this simulated example data.
