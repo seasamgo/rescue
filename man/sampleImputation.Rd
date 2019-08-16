@@ -44,7 +44,7 @@ A sparse matrix of class 'dgCMatrix'.
 library(Seurat)
 pbmc_small
 pbmc_small_imputed <- sampleImputation(
-  expression_matrix = pbmc_small@data,
-  subset_genes = pbmc_small@var.genes
+  expression_matrix = pbmc_small@assays$RNA@data,
+  subset_genes = pbmc_small@assays$RNA@var.features
   )
 }

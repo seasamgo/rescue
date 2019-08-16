@@ -80,15 +80,15 @@ sampleImputation <- function(
   seurat_object <- methods::new(
     Class = 'Seurat',
     assays = list(
-      RNA = new(
+      RNA = methods::new(
         Class = 'Assay',
         data = my_small_matrix,
-        scale.data = as(my_small_matrix_scaled, 'matrix')
+        scale.data = methods::as(my_small_matrix_scaled, 'matrix')
       )
     ),
     active.assay = 'RNA',
     active.ident = as.factor(colnames(my_small_matrix)),
-    version = packageVersion(pkg = 'Seurat')
+    version = utils::packageVersion(pkg = 'Seurat')
   )
 
   seurat_object@reductions$pca <- principal_component_object
