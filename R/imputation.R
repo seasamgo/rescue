@@ -188,7 +188,7 @@ sampleImputation <- function(
 #' pbmc_small_imputed <- bootstrapImputation(
 #'   expression_matrix = pbmc_small@data,
 #'   select_genes = pbmc_small@var.genes,
-#'   bootstrap_samples = 10
+#'   bootstrap_samples = 3
 #'   )
 #'
 
@@ -229,16 +229,10 @@ bootstrapImputation <- function(
 
     if(verbose) cat('finding variable genes \n \n')
 
-    seurat_object <- Seurat::CreateSeuratObject(counts = expression_matrix)
-
-    seurat_object <- Seurat::FindVariableFeatures(seurat_object,
-      nfeatures = 1000,
-      mean.cutoff = c(.0125, Inf),
-      dispersion.cutoff = c(.0125, Inf),
-      verbose = FALSE
-    )
-    select_genes <- seurat_object@assays$RNA@var.features
+    hvgs <- computeHVG(expression_matrix)
+    select_genes <- hvgs[ selected == 'yes', ]$genes
   }
+
 
   ## determine number of genes to sample ##
   total_number_of_genes <- length(select_genes)

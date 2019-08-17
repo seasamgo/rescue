@@ -1,7 +1,7 @@
 Package: rescue
 Type: Package
 Title: Bootstrap imputation for single-cell RNA-seq data
-Version: 0.1.1
+Version: 1.0.0
 Date: 2019-08-14
 Author: Sam Tracy & Ruben Dries
 Maintainer: Sam Tracy <stracy@g.harvard.edu>
@@ -17,6 +17,7 @@ Imports:
     Matrix,
     parallel,
     irlba,
+    data.table,
     Seurat
 License: GPL-2 | GPL-3
 LazyData: FALSE
@@ -24,8 +25,5 @@ URL: https://github.com/seasamgo/rescue
 BugReports: http://github.com/seasamgo/rescue/issues
 RoxygenNote: 6.1.1
 Suggests:
-    knitr,
-    rmarkdown
-VignetteBuilder:
     knitr,
     rmarkdown

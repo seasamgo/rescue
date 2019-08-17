@@ -58,7 +58,7 @@ A list containing the imputed and original expression matrices
   pbmc_small_imputed <- bootstrapImputation(
     expression_matrix = pbmc_small@assays$RNA@data,
     select_genes = pbmc_small@assays$RNA@var.features,
-    bootstrap_samples = 10
+    bootstrap_samples = 3
     )
 }
 
