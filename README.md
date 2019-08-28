@@ -3,19 +3,30 @@
 README
 ------
 
-This package provides a bootstrap imputation method for dropout events in scRNAseq data published [here](https://doi.org/10.1186/s12859-019-2977-0).  
+This package provides a bootstrap imputation method for dropout events in scRNAseq data published [here](https://doi.org/10.1186/s12859-019-2977-0).
 
 NEWS
 ----
 
-> Aug. 14, 2019
+> Aug. 28, 2019  
 
--   Version 0.1.1 released!
--   Compatible with Seurat v3.
--   Informative genes may be determined using any pipeline (e.g. scran) or method and indicated with `select_genes`.
+-   Version 1.0.0.
+-   Independent of scRNAseq pipeline.
+-   Informative genes may be determined using the `computeHVG` function (also the default) or any other package (e.g. Seurat, scran) and indicated with `select_genes`
+
+
+Requirements
+------------
+
+- R (>= 3.5.1)  
+- Python (>= 3.0)  
+
+The SNN clustering step still uses the Louvain Algorithm but now borrows from the implementation in the [Giotto](https://www.biorxiv.org/content/10.1101/701680v1) pipeline.  
 
 Installation
 ------------
+
+R package  
 
 ``` r
 install.packages("devtools", repos="http://cran.rstudio.com/")
@@ -23,6 +34,19 @@ library(devtools)
 devtools::install_github("seasamgo/rescue")
 library(rescue)
 ```
+
+Required python modules  
+- pandas  
+- networkx  
+- community  
+
+Install with pip
+
+``` 
+pip install pandas
+pip install networkx
+pip install louvain
+``` 
 
 Method
 ------
@@ -35,6 +59,8 @@ bootstrapImputation(
   select_cells = NULL,                # subset cells
   select_genes = NULL,                # informative genes
   proportion_genes = 0.6,             # proportion of genes to sample
+  log_transformed = TRUE,             # whether expression matrix is log-transformed
+  log_base = exp(1),                  # log base of log-transformation
   bootstrap_samples = 100,            # number of samples
   number_pcs = 8,                     # number of PC's to consider
   snn_resolution = 0.9,               # clustering resolution
@@ -80,7 +106,7 @@ cell_types <- SummarizedExperiment::colData(splat)$Group
 cell_types <- as.factor(gsub('Group', 'Cell type ', cell_types))
 ```
 
-To visualize this data we'll use the Seurat pipeline, which imports with the rescue package.
+To visualize this data we'll use the Seurat pipeline. However, whichever pipeline fits the needs of your downstream analysis will do.
 
 ``` r
 library(Seurat)
