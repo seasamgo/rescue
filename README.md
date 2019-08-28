@@ -18,7 +18,7 @@ NEWS
 Requirements
 ------------
 
-- R (>= 3.5.1)  
+- R (>= 3.5)  
 - Python (>= 3.0)  
 
 The SNN clustering step still uses the Louvain Algorithm but now borrows from the implementation in the [Giotto](https://www.biorxiv.org/content/10.1101/701680v1) pipeline.  
