@@ -252,7 +252,7 @@ bootstrapImputation <- function(
       )
 
       result_list[[as.character(round)]] <- temp_impute
-      if(verbose) cat('sample ', round, ': \n \n')
+      if(verbose) cat('sample: ', round, '\n \n')
     }
   }
 

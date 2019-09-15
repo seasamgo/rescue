@@ -114,7 +114,7 @@ clusterLouvain <- function(
   ## check or make paths
   # python path
   if(is.null(python_path)) {
-    python_path = system('which python3', intern = T)
+    python_path = system('which python', intern = T)
   }
 
   # prepare python path and louvain script
