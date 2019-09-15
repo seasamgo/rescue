@@ -19,7 +19,7 @@ in scRNAseq data published
 
 ## Requirements
 
-  - R (\>= 3.5)  
+  - R (\>= 3.4)  
   - Python (\>= 2.7 or 3.0)
 
 The SNN clustering step still uses the Louvain Algorithm but now borrows
@@ -29,15 +29,16 @@ pipeline.
 ## Installation
 
 Required python modules  
-\- pandas  
-\- networkx  
-\- community
+
+  - pandas  
+  - networkx  
+  - community
 
 Install with pip
 
     pip install pandas
     pip install networkx
-    pip install louvain
+    pip install python-louvain
 
 If you have multiple python versions installed, you may preemptively
 force the reticulate package to use the desired version. Doing so after

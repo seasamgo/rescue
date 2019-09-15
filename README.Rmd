@@ -28,7 +28,7 @@ This package provides a bootstrap imputation method for dropout events in scRNAs
 
 ## Requirements
 
-- R (>= 3.5)  
+- R (>= 3.4)  
 - Python (>= 2.7 or 3.0)  
 
 The SNN clustering step still uses the Louvain Algorithm but now borrows from the implementation in the [Giotto](https://doi.org/10.1101/701680) pipeline.  
@@ -36,6 +36,7 @@ The SNN clustering step still uses the Louvain Algorithm but now borrows from th
 ## Installation
 
 Required python modules  
+
 - pandas  
 - networkx  
 - community  
@@ -45,7 +46,7 @@ Install with pip
 ````
 pip install pandas
 pip install networkx
-pip install louvain
+pip install python-louvain
 ````
 
 If you have multiple python versions installed, you may preemptively force the reticulate package to use the desired version. Doing so after it has been initialized will result in an error. For example:
