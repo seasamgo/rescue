@@ -22,11 +22,8 @@
 #'
 #' @examples
 #' \dontrun{
-#' pbmc_small
-#' pbmc_small_imputed <- sampleImputation(
-#'   expression_matrix = pbmc_small@data,
-#'   subset_genes = pbmc_small@var.genes
-#'   )
+#' sampleImputation(expression_matrix)
+#' }
 #'
 
 sampleImputation <- function(
@@ -64,51 +61,22 @@ sampleImputation <- function(
 
   pcs_compute <- min(number_pcs, nrow(x = my_small_matrix_scaled)-1)
   pca_results <- irlba::irlba(A = my_small_matrix_scaled, nv = pcs_compute)
-  cell_embeddings <- pca_results$v
+  cell_embeddings <- methods::as(pca_results$v, 'dgCMatrix')
   colnames(cell_embeddings) <- paste0('PC',1:number_pcs)
   rownames(cell_embeddings) <- colnames(expression_matrix)
-  principal_component_object <- methods::new(
-    Class = 'DimReduc',
-    cell.embeddings = cell_embeddings,
-    key = 'PC_'
-  )
 
 
   ## SNN ##
-  if(verbose) cat('searching shared nearest neighbors \n \n')
+  if(verbose) cat('constructing nearest neighbors graph \n \n')
 
-  seurat_object <- methods::new(
-    Class = 'Seurat',
-    assays = list(
-      RNA = methods::new(
-        Class = 'Assay',
-        data = my_small_matrix,
-        scale.data = methods::as(my_small_matrix_scaled, 'matrix')
-      )
-    ),
-    active.assay = 'RNA',
-    active.ident = as.factor(colnames(my_small_matrix)),
-    version = utils::packageVersion(pkg = 'Seurat')
-  )
+  nn <- constructNN(reduced_object = cell_embeddings, k = 30)
 
-  seurat_object@reductions$pca <- principal_component_object
+  if(verbose) cat('clustering nearest neighbors \n \n')
 
-  seurat_object <- Seurat::FindNeighbors(
-    seurat_object,
-    verbose = FALSE,
-    dims = 1:number_pcs
-  )
+  cluster_results <- clusterLouvain(nn_network = nn, resolution = snn_resolution)
 
-  seurat_object <- Seurat::FindClusters(
-    object = seurat_object,
-    verbose = FALSE,
-    resolution = snn_resolution
-  )
-
-  clusters <- seurat_object@active.ident
-  names(clusters) <- colnames(expression_matrix)
-
-  remove(seurat_object)
+  clusters <- cluster_results$cluster
+  names(clusters) <- cluster_results$cell_ID
 
   ## IMPUTATION step ##
   impute_result_list <- list()
@@ -168,6 +136,8 @@ sampleImputation <- function(
 #' @param select_cells Subset cells if desired
 #' @param select_genes A vector of highly variable of differentially expressed gene names,
 #' defaults to the most variable
+#' @param log_transformed Whether the expression matrix has been log-transformed
+#' @param log_base If log-transformed, log-base used
 #' @param proportion_genes Proportion of informative genes to sample
 #' @param bootstrap_samples Number of samples for the bootstrap
 #' @param number_pcs Number of dimensions to inform SNN clustering
@@ -184,12 +154,8 @@ sampleImputation <- function(
 #'
 #' @examples
 #' \dontrun{
-#' pbmc_small
-#' pbmc_small_imputed <- bootstrapImputation(
-#'   expression_matrix = pbmc_small@data,
-#'   select_genes = pbmc_small@var.genes,
-#'   bootstrap_samples = 10
-#'   )
+#' bootstrapImputation(expression_matrix)
+#' }
 #'
 
 
@@ -197,6 +163,8 @@ bootstrapImputation <- function(
   expression_matrix,
   select_cells = NULL,
   select_genes = NULL,
+  log_transformed = TRUE,
+  log_base = exp(1),
   proportion_genes = 0.6,
   bootstrap_samples = 100,
   number_pcs = 8,
@@ -229,16 +197,13 @@ bootstrapImputation <- function(
 
     if(verbose) cat('finding variable genes \n \n')
 
-    seurat_object <- Seurat::CreateSeuratObject(counts = expression_matrix)
+    hvgs <- computeHVG(expression_matrix, reverse_log_scale = log_transformed, log_base = log_base)
+    select_genes <- hvgs[ selected == 'yes', ]$genes
 
-    seurat_object <- Seurat::FindVariableFeatures(seurat_object,
-      nfeatures = 1000,
-      mean.cutoff = c(.0125, Inf),
-      dispersion.cutoff = c(.0125, Inf),
-      verbose = FALSE
-    )
-    select_genes <- seurat_object@assays$RNA@var.features
+    if(is.null(select_genes)) stop('No HVGs detected by default!')
+    else if(verbose) cat('using', length(select_genes), 'variable genes \n \n')
   }
+
 
   ## determine number of genes to sample ##
   total_number_of_genes <- length(select_genes)
@@ -287,7 +252,7 @@ bootstrapImputation <- function(
       )
 
       result_list[[as.character(round)]] <- temp_impute
-      if(verbose) cat('sample ', round, ': \n \n')
+      if(verbose) cat('sample: ', round, '\n \n')
     }
   }
 
