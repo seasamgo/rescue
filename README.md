@@ -186,10 +186,6 @@ Seurat::DimPlot(expression_imputed, reduction = "tsne")
 
 ![](man/figures/README-unnamed-chunk-11-1.png)<!-- -->
 
-The recovery of missing expression values due to dropout events allows
-us to correctly distinguish cell types with basic data visualization
-techniques in this simulated example data.
-
 The recovery of missing expression values due to dropout events allows 
 us to more accurately distinguish cell types with basic data 
 visualization techniques in this simulated example.
