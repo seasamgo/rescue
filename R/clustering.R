@@ -114,8 +114,18 @@ clusterLouvain <- function(
   ## check or make paths
   # python path
   if(is.null(python_path)) {
-    python_path = system('which python', intern = T)
+    
+    if(.Platform[['OS.type']] == 'unix') {
+      python_path = try(system('which python', intern = T))
+    } else if(.Platform[['OS.type']] == 'windows') {
+      python_path = try(system('where python', intern = T))
+      if(class(python_path) == "try-error") {
+        cat('\n no python path found, set it manually when needed \n')
+        python_path = '/set/your/python/path/manually/please/'
+      }
+    }
   }
+  python_path = as.character(python_path)
 
   # prepare python path and louvain script
   reticulate::use_python(required = T, python = python_path)
