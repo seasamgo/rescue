@@ -13,6 +13,7 @@
 #' @param snn_resolution Resolution parameter for SNN
 #' @param impute_index Index to impute, will default to all zeroes
 #' @param pseudo_zero Pseudo-zero expression value
+#' @param python_path path to your python binary (default = system path)
 #' @param verbose Print progress output to the console
 #'
 #' @return Returns a sparse matrix of class 'dgCMatrix'
@@ -34,6 +35,7 @@ sampleImputation <- function(
   snn_resolution = .9,
   impute_index = NULL,
   pseudo_zero = NULL,
+  python_path = NULL,
   verbose = FALSE
   ) {
 
@@ -73,7 +75,7 @@ sampleImputation <- function(
 
   if(verbose) cat('clustering nearest neighbors \n \n')
 
-  cluster_results <- clusterLouvain(nn_network = nn, resolution = snn_resolution)
+  cluster_results <- clusterLouvain(nn_network = nn, resolution = snn_resolution, python_path = python_path)
 
   clusters <- cluster_results$cluster
   names(clusters) <- cluster_results$cell_ID
@@ -146,6 +148,7 @@ sampleImputation <- function(
 #' @param use_mclapply Run in parallel, default FALSE
 #' @param cores Number of cores for parallelization
 #' @param return_individual_results Return a list of subsampled means
+#' @param python_path path to your python binary (default = system path)
 #' @param verbose Print progress output to the console
 #'
 #' @return Returns a list with the imputed and original expression matrices
@@ -173,6 +176,7 @@ bootstrapImputation <- function(
   use_mclapply = FALSE,
   cores = 2,
   return_individual_results = FALSE,
+  python_path = NULL,
   verbose = FALSE
   ) {
 
@@ -228,6 +232,7 @@ bootstrapImputation <- function(
         snn_resolution = snn_resolution,
         impute_index = impute_index,
         pseudo_zero = pseudo_zero,
+        python_path = python_path,
         verbose = verbose
       )
 
@@ -248,6 +253,7 @@ bootstrapImputation <- function(
         snn_resolution = snn_resolution,
         impute_index = impute_index,
         pseudo_zero = pseudo_zero,
+        python_path = python_path,
         verbose = verbose
       )
 
