@@ -4,8 +4,14 @@
 \alias{constructNN}
 \title{Nearest Network}
 \usage{
-constructNN(reduced_object, k = 30, minimum_shared = 5,
-  top_shared = 3, verbose = F, ...)
+constructNN(
+  reduced_object,
+  k = 30,
+  minimum_shared = 5,
+  top_shared = 3,
+  verbose = F,
+  ...
+)
 }
 \arguments{
 \item{reduced_object}{PC reduction matrix}

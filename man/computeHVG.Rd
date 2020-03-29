@@ -4,9 +4,14 @@
 \alias{computeHVG}
 \title{Compute Highly Variable Genes}
 \usage{
-computeHVG(expression_matrix, reverse_log_scale = T, log_base = exp(1),
-  expression_threshold = 0, nr_expression_groups = 20,
-  zscore_threshold = 1.5)
+computeHVG(
+  expression_matrix,
+  reverse_log_scale = T,
+  log_base = exp(1),
+  expression_threshold = 0,
+  nr_expression_groups = 20,
+  zscore_threshold = 1.5
+)
 }
 \arguments{
 \item{expression_matrix}{Expression matrix}
