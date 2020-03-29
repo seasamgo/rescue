@@ -58,11 +58,11 @@ Install with pip
     pip install networkx
     pip install python-louvain
 
-If you have multiple python versions installed, you may preemptively
-force the reticulate package to use the desired version by specifying
-the path to the python version you want to use. This can be done using
-the **python\_path** parameter within a function or directly set at the
-beginning of your script. For example:
+If you chose the manual installation and have multiple python versions
+installed, you may preemptively force the reticulate package to use the
+desired version by specifying the path to the python version you want to
+use. This can be done using the **python\_path** parameter within a
+function or directly set at the beginning of your script. For example:
 
 ``` r
 reticulate::use_python('~/anaconda2/bin/python', required = T)
