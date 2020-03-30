@@ -114,7 +114,10 @@ clusterLouvain <- function(
   ## check or make paths
   # python path
   if(is.null(python_path)) {
-    
+
+    # this will initialize python for reticulate and suggest to install miniconda if not present
+    reticulate::py_config()
+
     if(.Platform[['OS.type']] == 'unix') {
       python_path = try(system('which python', intern = T))
     } else if(.Platform[['OS.type']] == 'windows') {
