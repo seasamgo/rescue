@@ -20,33 +20,13 @@ in scRNAseq data published
 ## Requirements
 
   - R (\>= 3.4)  
-  - Python (\>= 2.7 or 3.0)
+  - Python (\>= 3.0)
 
 The SNN clustering step still uses the Louvain Algorithm but now borrows
-from the implementation in the [Giotto](https://doi.org/10.1101/701680)
+from the implementation in the [Giotto](https://rubd.github.io/Giotto/)
 pipeline.
 
 ## Installation
-
-Required python modules  
-
-  - pandas  
-  - networkx  
-  - community
-
-Install with pip
-
-    pip install pandas
-    pip install networkx
-    pip install python-louvain
-
-If you have multiple python versions installed, you may preemptively
-force the reticulate package to use the desired version. Doing so after
-it has been initialized will result in an error. For example:
-
-``` r
-reticulate::use_python('~/anaconda2/bin/python', required = T)
-```
 
 Install the rescue package using devtools.
 
@@ -55,6 +35,37 @@ install.packages("devtools", repos="http://cran.rstudio.com/")
 library(devtools)
 devtools::install_github("seasamgo/rescue")
 library(rescue)
+```
+
+#### Required python modules
+
+  - pandas  
+  - networkx  
+  - community (from python-louvain)
+
+##### Automatic installation
+
+The python modules will be installed automatically in a miniconda
+environment when installing rescue. However, it will ask you whether you
+want to install them and you can opt out and go for a manual
+installation if that is preferred.
+
+##### Manual installation
+
+Install with pip
+
+    pip install pandas
+    pip install networkx
+    pip install python-louvain
+
+If you chose the manual installation and have multiple python versions
+installed, you may preemptively force the reticulate package to use the
+desired version by specifying the path to the python version you want to
+use. This can be done using the **python\_path** parameter within a
+function or directly set at the beginning of your script. For example:
+
+``` r
+reticulate::use_python('~/anaconda2/bin/python', required = T)
 ```
 
 ## Method
@@ -156,18 +167,11 @@ expression_true <- Seurat::RunPCA(expression_true, features = rownames(expressio
 expression_true <- Seurat::SetIdent(expression_true, value = cell_types)
 expression_true <- Seurat::RunTSNE(expression_true)
 Seurat::DimPlot(expression_true, reduction = "tsne")
-```
-
-![](man/figures/README-unnamed-chunk-10-1.png)<!-- -->
-
-``` r
 expression_dropout <- Seurat::RunPCA(expression_dropout, features = rownames(expression_dropout), verbose = FALSE)
 expression_dropout <- Seurat::SetIdent(expression_dropout, value = cell_types)
 expression_dropout <- Seurat::RunTSNE(expression_dropout)
 Seurat::DimPlot(expression_dropout, reduction = "tsne")
 ```
-
-![](man/figures/README-unnamed-chunk-10-2.png)<!-- -->
 
 It’s clear that dropout has distorted our evaluation of the data by cell
 type as compared to what we should see with the full set of counts. Now
@@ -184,10 +188,8 @@ expression_imputed <- Seurat::RunTSNE(expression_imputed)
 Seurat::DimPlot(expression_imputed, reduction = "tsne")
 ```
 
-![](man/figures/README-unnamed-chunk-11-1.png)<!-- -->
-
-The recovery of missing expression values due to dropout events allows 
-us to more accurately distinguish cell types with basic data 
+The recovery of missing expression values due to dropout events allows
+us to more accurately distinguish cell types with basic data
 visualization techniques in this simulated example.
 
 ## References

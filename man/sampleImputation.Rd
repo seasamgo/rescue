@@ -4,9 +4,17 @@
 \alias{sampleImputation}
 \title{Sample-mean Estimation}
 \usage{
-sampleImputation(expression_matrix, subset_genes = NULL,
-  scale_data = TRUE, number_pcs = 8, snn_resolution = 0.9,
-  impute_index = NULL, pseudo_zero = NULL, verbose = FALSE)
+sampleImputation(
+  expression_matrix,
+  subset_genes = NULL,
+  scale_data = TRUE,
+  number_pcs = 8,
+  snn_resolution = 0.9,
+  impute_index = NULL,
+  pseudo_zero = NULL,
+  python_path = NULL,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{expression_matrix}{Row by column log-normalized expression matrix}
@@ -22,6 +30,8 @@ sampleImputation(expression_matrix, subset_genes = NULL,
 \item{impute_index}{Index to impute, will default to all zeroes}
 
 \item{pseudo_zero}{Pseudo-zero expression value}
+
+\item{python_path}{path to your python binary (default = system path)}
 
 \item{verbose}{Print progress output to the console}
 }

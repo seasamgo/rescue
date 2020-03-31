@@ -4,11 +4,23 @@
 \alias{bootstrapImputation}
 \title{Bootstrap Imputation}
 \usage{
-bootstrapImputation(expression_matrix, select_cells = NULL,
-  select_genes = NULL, log_transformed = TRUE, log_base = exp(1),
-  proportion_genes = 0.6, bootstrap_samples = 100, number_pcs = 8,
-  snn_resolution = 0.9, impute_index = NULL, use_mclapply = FALSE,
-  cores = 2, return_individual_results = FALSE, verbose = FALSE)
+bootstrapImputation(
+  expression_matrix,
+  select_cells = NULL,
+  select_genes = NULL,
+  log_transformed = TRUE,
+  log_base = exp(1),
+  proportion_genes = 0.6,
+  bootstrap_samples = 100,
+  number_pcs = 8,
+  snn_resolution = 0.9,
+  impute_index = NULL,
+  use_mclapply = FALSE,
+  cores = 2,
+  return_individual_results = FALSE,
+  python_path = NULL,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{expression_matrix}{Row by column log-normalized expression matrix}
@@ -37,6 +49,8 @@ defaults to the most variable}
 \item{cores}{Number of cores for parallelization}
 
 \item{return_individual_results}{Return a list of subsampled means}
+
+\item{python_path}{path to your python binary (default = system path)}
 
 \item{verbose}{Print progress output to the console}
 }
