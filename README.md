@@ -90,7 +90,7 @@ bootstrapImputation(
   use_mclapply = FALSE,               # run in parallel
   cores = 2,                          # number of parallel cores
   return_individual_results = FALSE,  # return sample means
-  pyton_path = NULL,                  # path to the python version to use, defaults to default path
+  python_path = NULL,                  # path to the python version to use, defaults to default path
   verbose = FALSE                     # print progress to console
   )
 ```
