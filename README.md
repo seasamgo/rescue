@@ -9,9 +9,10 @@ in scRNAseq data published
 
 ## News
 
-> Sep. 15, 2019
+> Jul. 3, 2020
 
-  - Version 1.0.0.
+  - Version 1.0.2.
+  - update bugs
   - Independent of scRNAseq pipeline.
   - Informative genes may be determined using the `computeHVG` function
     (also the default) or any other package (e.g. Seurat, scran) and
@@ -61,8 +62,9 @@ Install with pip
 If you chose the manual installation and have multiple python versions
 installed, you may preemptively force the reticulate package to use the
 desired version by specifying the path to the python version you want to
-use. This can be done using the **python\_path** parameter within a
-function or directly set at the beginning of your script. For example:
+use. This can be done using the **python\_path** parameter within the
+**bootstrapImputation** function or directly set at the beginning of
+your script. For example:
 
 ``` r
 reticulate::use_python('~/anaconda2/bin/python', required = T)
@@ -88,6 +90,7 @@ bootstrapImputation(
   use_mclapply = FALSE,               # run in parallel
   cores = 2,                          # number of parallel cores
   return_individual_results = FALSE,  # return sample means
+  python_path = NULL,                  # path to the python version to use, defaults to default path
   verbose = FALSE                     # print progress to console
   )
 ```
@@ -179,7 +182,7 @@ let’s impute zero counts to recover missing expression values and
 reevaluate.
 
 ``` r
-impute <- rescue::bootstrapImputation(expression_matrix = expression_dropout@assays$RNA@data)
+impute <- rescue::bootstrapImputation(expression_matrix = expression_dropout@assays$RNA@data) # python_path can be set here
 expression_imputed <- Seurat::CreateSeuratObject(counts = impute$final_imputation)
 expression_imputed <- Seurat::ScaleData(expression_imputed)
 expression_imputed <- Seurat::RunPCA(expression_imputed, features = rownames(expression_imputed), verbose = FALSE)

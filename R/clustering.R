@@ -8,7 +8,7 @@
 #' @param minimum_shared Minimum shared neighbors
 #' @param top_shared Keep at ...
 #' @param verbose Be verbose
-#' @param ... Additional parameters
+#' @param \dots Additional parameters
 #'
 #' @return NN network as igraph object
 #'
@@ -26,6 +26,9 @@ constructNN <- function(
   ...
   ) {
 
+
+  # data.table variables
+  from_cell_ID = from = to_cell_ID = to = shared = weight = distance = NULL
 
   # vector for cell_ID
   cell_names = rownames(reduced_object)
@@ -62,7 +65,7 @@ constructNN <- function(
   snn_network_dt[, to_cell_ID := cell_names[to]]
 
   # rank snn
-  setorder(snn_network_dt, from, -shared)
+  data.table::setorder(snn_network_dt, from, -shared)
   snn_network_dt[, rank := 1:.N, by = from]
 
   # filter snn
@@ -144,6 +147,9 @@ clusterLouvain <- function(
 
   network_edge_dt = data.table::as.data.table(igraph::as_data_frame(x = nn_network, what = 'edges'))
 
+  # data.table variables
+  weight = NULL
+
   if(!is.null(weight_col)) {
 
     if(!weight_col %in% colnames(network_edge_dt)) {
@@ -151,7 +157,7 @@ clusterLouvain <- function(
     } else {
       # weight is defined by attribute of igraph object
       network_edge_dt = network_edge_dt[,c('from', 'to', weight_col), with = F]
-      setnames(network_edge_dt, weight_col, 'weight')
+      data.table::setnames(network_edge_dt, weight_col, 'weight')
     }
   } else {
     # weight is the same

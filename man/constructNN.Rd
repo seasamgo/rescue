@@ -24,7 +24,7 @@ constructNN(
 
 \item{verbose}{Be verbose}
 
-\item{...}{Additional parameters}
+\item{\dots}{Additional parameters}
 }
 \value{
 NN network as igraph object

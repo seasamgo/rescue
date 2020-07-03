@@ -3,3 +3,6 @@
 export(bootstrapImputation)
 export(computeHVG)
 export(sampleImputation)
+import(data.table)
+import(ggplot2)
+import(utils)
