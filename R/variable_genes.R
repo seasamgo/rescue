@@ -26,6 +26,9 @@ computeHVG <- function(
   zscore_threshold = 1.5
   ) {
 
+  # data.table variables
+  covariance = stdev = mean_expr = expr_groups = cov_group_zscore = selected = NULL
+
   if(reverse_log_scale == TRUE) {
     expression_matrix = (log_base^expression_matrix)-1
   }

@@ -8,7 +8,7 @@
 #' @param minimum_shared Minimum shared neighbors
 #' @param top_shared Keep at ...
 #' @param verbose Be verbose
-#' @param ... Additional parameters
+#' @param \dots Additional parameters
 #'
 #' @return NN network as igraph object
 #'
@@ -26,6 +26,9 @@ constructNN <- function(
   ...
   ) {
 
+
+  # data.table variables
+  from_cell_ID = from = to_cell_ID = to = shared = weight = distance = NULL
 
   # vector for cell_ID
   cell_names = rownames(reduced_object)
@@ -143,6 +146,9 @@ clusterLouvain <- function(
   }
 
   network_edge_dt = data.table::as.data.table(igraph::as_data_frame(x = nn_network, what = 'edges'))
+
+  # data.table variables
+  weight = NULL
 
   if(!is.null(weight_col)) {
 

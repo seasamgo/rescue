@@ -201,6 +201,9 @@ bootstrapImputation <- function(
 
     if(verbose) cat('finding variable genes \n \n')
 
+    # data.table variables
+    selected = NULL
+
     hvgs <- computeHVG(expression_matrix, reverse_log_scale = log_transformed, log_base = log_base)
     select_genes <- hvgs[ selected == 'yes', ]$genes
 
@@ -220,6 +223,7 @@ bootstrapImputation <- function(
       X = 1:bootstrap_samples,
       mc.preschedule = FALSE,
       mc.cores = cores,
+
       FUN = function(round) {
 
       gene_sample <- sample(x = 1:total_number_of_genes, size = number_of_genes_to_use, replace = F)
