@@ -4,9 +4,18 @@
 \alias{sampleImputation}
 \title{Sample-mean Estimation}
 \usage{
-sampleImputation(expression_matrix, subset_genes = NULL,
-  scale_data = TRUE, number_pcs = 8, snn_resolution = 0.9,
-  impute_index = NULL, pseudo_zero = NULL, verbose = FALSE)
+sampleImputation(
+  expression_matrix,
+  subset_genes = NULL,
+  scale_data = TRUE,
+  number_pcs = 8,
+  k_neighbors = 30,
+  snn_resolution = 0.9,
+  impute_index = NULL,
+  pseudo_zero = NULL,
+  python_path = NULL,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{expression_matrix}{Row by column log-normalized expression matrix}
@@ -17,11 +26,15 @@ sampleImputation(expression_matrix, subset_genes = NULL,
 
 \item{number_pcs}{Number of dimensions to inform SNN clustering}
 
+\item{k_neighbors}{Number of k neighbors to use for NN network}
+
 \item{snn_resolution}{Resolution parameter for SNN}
 
 \item{impute_index}{Index to impute, will default to all zeroes}
 
 \item{pseudo_zero}{Pseudo-zero expression value}
+
+\item{python_path}{path to your python binary (default = system path)}
 
 \item{verbose}{Print progress output to the console}
 }

@@ -4,9 +4,16 @@
 \alias{clusterLouvain}
 \title{Cluster Cells via Louvain Algorithm}
 \usage{
-clusterLouvain(nn_network, python_path = NULL, resolution = 1,
-  weight_col = NULL, louv_random = F, set_seed = T,
-  seed_number = 0, ...)
+clusterLouvain(
+  nn_network,
+  python_path = NULL,
+  resolution = 1,
+  weight_col = NULL,
+  louv_random = F,
+  set_seed = T,
+  seed_number = 0,
+  ...
+)
 }
 \arguments{
 \item{nn_network}{Constructed nearest neighbor network to use}

@@ -10,9 +10,11 @@
 #' @param subset_genes A vector of informative gene names, defaults to all genes
 #' @param scale_data Whether to standardize expression by gene, default TRUE
 #' @param number_pcs Number of dimensions to inform SNN clustering
+#' @param k_neighbors Number of k neighbors to use for NN network
 #' @param snn_resolution Resolution parameter for SNN
 #' @param impute_index Index to impute, will default to all zeroes
 #' @param pseudo_zero Pseudo-zero expression value
+#' @param python_path path to your python binary (default = system path)
 #' @param verbose Print progress output to the console
 #'
 #' @return Returns a sparse matrix of class 'dgCMatrix'
@@ -31,9 +33,11 @@ sampleImputation <- function(
   subset_genes = NULL,
   scale_data = TRUE,
   number_pcs = 8,
+  k_neighbors = 30,
   snn_resolution = .9,
   impute_index = NULL,
   pseudo_zero = NULL,
+  python_path = NULL,
   verbose = FALSE
   ) {
 
@@ -69,11 +73,11 @@ sampleImputation <- function(
   ## SNN ##
   if(verbose) cat('constructing nearest neighbors graph \n \n')
 
-  nn <- constructNN(reduced_object = cell_embeddings, k = 30)
+  nn <- constructNN(reduced_object = cell_embeddings, k_neighbors = k_neighbors)
 
   if(verbose) cat('clustering nearest neighbors \n \n')
 
-  cluster_results <- clusterLouvain(nn_network = nn, resolution = snn_resolution)
+  cluster_results <- clusterLouvain(nn_network = nn, resolution = snn_resolution, python_path = python_path)
 
   clusters <- cluster_results$cluster
   names(clusters) <- cluster_results$cell_ID
@@ -141,11 +145,13 @@ sampleImputation <- function(
 #' @param proportion_genes Proportion of informative genes to sample
 #' @param bootstrap_samples Number of samples for the bootstrap
 #' @param number_pcs Number of dimensions to inform SNN clustering
+#' @param k_neighbors Number of k neighbors to use for NN network
 #' @param snn_resolution Resolution parameter for SNN
 #' @param impute_index Index to impute, will default to all zeroes
 #' @param use_mclapply Run in parallel, default FALSE
 #' @param cores Number of cores for parallelization
 #' @param return_individual_results Return a list of subsampled means
+#' @param python_path path to your python binary (default = system path)
 #' @param verbose Print progress output to the console
 #'
 #' @return Returns a list with the imputed and original expression matrices
@@ -168,11 +174,13 @@ bootstrapImputation <- function(
   proportion_genes = 0.6,
   bootstrap_samples = 100,
   number_pcs = 8,
+  k_neighbors = 30,
   snn_resolution = .9,
   impute_index = NULL,
   use_mclapply = FALSE,
   cores = 2,
   return_individual_results = FALSE,
+  python_path = NULL,
   verbose = FALSE
   ) {
 
@@ -197,6 +205,9 @@ bootstrapImputation <- function(
 
     if(verbose) cat('finding variable genes \n \n')
 
+    # data.table variables
+    selected = NULL
+
     hvgs <- computeHVG(expression_matrix, reverse_log_scale = log_transformed, log_base = log_base)
     select_genes <- hvgs[ selected == 'yes', ]$genes
 
@@ -216,6 +227,7 @@ bootstrapImputation <- function(
       X = 1:bootstrap_samples,
       mc.preschedule = FALSE,
       mc.cores = cores,
+
       FUN = function(round) {
 
       gene_sample <- sample(x = 1:total_number_of_genes, size = number_of_genes_to_use, replace = F)
@@ -225,9 +237,11 @@ bootstrapImputation <- function(
         expression_matrix = expression_matrix,
         subset_genes = genes_to_use,
         number_pcs = number_pcs,
+        k_neighbors = k_neighbors,
         snn_resolution = snn_resolution,
         impute_index = impute_index,
         pseudo_zero = pseudo_zero,
+        python_path = python_path,
         verbose = verbose
       )
 
@@ -245,9 +259,11 @@ bootstrapImputation <- function(
         expression_matrix = expression_matrix,
         subset_genes = genes_to_use,
         number_pcs = number_pcs,
+        k_neighbors = k_neighbors,
         snn_resolution = snn_resolution,
         impute_index = impute_index,
         pseudo_zero = pseudo_zero,
+        python_path = python_path,
         verbose = verbose
       )
 

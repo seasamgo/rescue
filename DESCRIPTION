@@ -1,15 +1,23 @@
 Package: rescue
 Type: Package
-Title: Bootstrap imputation for single-cell RNA-seq data
-Version: 1.0.0
-Date: 2019-08-14
+Title: Bootstrap Imputation for Single-Cell RNA-Seq Data
+Version: 1.0.3
+Date: 2020-07-12
 Author: Sam Tracy & Ruben Dries
-Maintainer: Sam Tracy <stracy@g.harvard.edu>
+Maintainer: Sam Tracy <seasamgo@gmail.com>
 Description: Given a log-transformed expression matrix and list of informative genes: 
-    subsample informative genes, cluster samples using SNN clustering, estimate missing 
-    expression values with the distribution mean of means extrapolated from these cell 
-    clusterings, and return an imputed expression matrix. See Tracy, S., Dries, R., and 
-    Yuan, G.C. (2019) <doi:10.1186/s12859-019-2977-0> for more details.
+    subsample informative genes, cluster samples using shared nearest neighbors clustering, 
+    estimate missing expression values with the distribution mean of means extrapolated 
+    from these cell clusterings, and return an imputed expression matrix. See Tracy, S., 
+    Yuan, G.C. and Dries, R. (2019) <doi:10.1186/s12859-019-2977-0> for more details.
+Config/reticulate:
+  list(
+    packages = list(
+      list(package = "pandas"),
+      list(package = "networkx"),
+      list(package = "python-louvain")
+    )
+  )
 Depends:
     R (>= 3.4.0),
     utils
@@ -21,12 +29,12 @@ Imports:
     Matrix,
     methods,
     parallel,
-    reticulate
+    reticulate (>= 1.14)
 License: GPL-2 | GPL-3
 LazyData: FALSE
 URL: https://github.com/seasamgo/rescue
 BugReports: http://github.com/seasamgo/rescue/issues
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.1
 Suggests:
     knitr,
     rmarkdown

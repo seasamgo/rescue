@@ -9,9 +9,11 @@ in scRNAseq data published
 
 ## News
 
-> Sep. 15, 2019
+> Jul. 12, 2020
 
-  - Version 1.0.0.
+  - Version 1.0.3.
+  - Include k neighbors as a parameter for NN network.
+  - Bug fixes.
   - Independent of scRNAseq pipeline.
   - Informative genes may be determined using the `computeHVG` function
     (also the default) or any other package (e.g. Seurat, scran) and
@@ -20,33 +22,13 @@ in scRNAseq data published
 ## Requirements
 
   - R (\>= 3.4)  
-  - Python (\>= 2.7 or 3.0)
+  - Python (\>= 3.0)
 
 The SNN clustering step still uses the Louvain Algorithm but now borrows
-from the implementation in the [Giotto](https://doi.org/10.1101/701680)
+from the implementation in the [Giotto](https://rubd.github.io/Giotto/)
 pipeline.
 
 ## Installation
-
-Required python modules  
-
-  - pandas  
-  - networkx  
-  - community
-
-Install with pip
-
-    pip install pandas
-    pip install networkx
-    pip install python-louvain
-
-If you have multiple python versions installed, you may preemptively
-force the reticulate package to use the desired version. Doing so after
-it has been initialized will result in an error. For example:
-
-``` r
-reticulate::use_python('~/anaconda2/bin/python', required = T)
-```
 
 Install the rescue package using devtools.
 
@@ -55,6 +37,38 @@ install.packages("devtools", repos="http://cran.rstudio.com/")
 library(devtools)
 devtools::install_github("seasamgo/rescue")
 library(rescue)
+```
+
+#### Required python modules
+
+  - pandas  
+  - networkx  
+  - community (from python-louvain)
+
+##### Automatic installation
+
+The python modules will be installed automatically in a miniconda
+environment when installing rescue. However, it will ask you whether you
+want to install them and you can opt out and go for a manual
+installation if that is preferred.
+
+##### Manual installation
+
+Install with pip
+
+    pip install pandas
+    pip install networkx
+    pip install python-louvain
+
+If you chose the manual installation and have multiple python versions
+installed, you may preemptively force the reticulate package to use the
+desired version by specifying the path to the python version you want to
+use. This can be done using the **python\_path** parameter within the
+**bootstrapImputation** function or directly set at the beginning of
+your script. For example:
+
+``` r
+reticulate::use_python('~/anaconda2/bin/python', required = T)
 ```
 
 ## Method
@@ -72,11 +86,13 @@ bootstrapImputation(
   log_base = exp(1),                  # log base of log-transformation
   bootstrap_samples = 100,            # number of samples
   number_pcs = 8,                     # number of PC's to consider
+  k_neighbors = 30,                   # number of neighbors for NN network
   snn_resolution = 0.9,               # clustering resolution
   impute_index = NULL,                # specify counts to impute, defaults to zero values
   use_mclapply = FALSE,               # run in parallel
   cores = 2,                          # number of parallel cores
   return_individual_results = FALSE,  # return sample means
+  python_path = NULL,                 # path to the python version to use, defaults to default path
   verbose = FALSE                     # print progress to console
   )
 ```
@@ -148,8 +164,7 @@ expression_dropout <- Seurat::ScaleData(expression_dropout, features = rownames(
 ```
 
 The last step is dimension reduction with PCA and then visualization
-with
-t-SNE.
+with t-SNE.
 
 ``` r
 expression_true <- Seurat::RunPCA(expression_true, features = rownames(expression_true), verbose = FALSE)
@@ -175,7 +190,7 @@ let’s impute zero counts to recover missing expression values and
 reevaluate.
 
 ``` r
-impute <- rescue::bootstrapImputation(expression_matrix = expression_dropout@assays$RNA@data)
+impute <- rescue::bootstrapImputation(expression_matrix = expression_dropout@assays$RNA@data) # python_path can be set here
 expression_imputed <- Seurat::CreateSeuratObject(counts = impute$final_imputation)
 expression_imputed <- Seurat::ScaleData(expression_imputed)
 expression_imputed <- Seurat::RunPCA(expression_imputed, features = rownames(expression_imputed), verbose = FALSE)
@@ -186,17 +201,17 @@ Seurat::DimPlot(expression_imputed, reduction = "tsne")
 
 ![](man/figures/README-unnamed-chunk-11-1.png)<!-- -->
 
-The recovery of missing expression values due to dropout events allows 
-us to more accurately distinguish cell types with basic data 
+The recovery of missing expression values due to dropout events allows
+us to more accurately distinguish cell types with basic data
 visualization techniques in this simulated example.
 
 ## References
 
-Dries, R., et al. (2019). Giotto, a pipeline for integrative analysis
+Dries, R., et al. (2019). Giotto, a pipeline for integrative analysis
 and visualization of single-cell spatial transcriptomic data. *BioRxiv*.
 doi: <https://doi.org/10.1101/701680>.
 
-Satija R., et al. (2019). Seurat: Tools for Single Cell Genomics. R
+Satija R., et al. (2019). Seurat: Tools for Single Cell Genomics. R
 package version 3.1.0. <https://CRAN.R-project.org/package=Seurat>.
 
 Tracy, S., Dries, R., Yuan, G. C. (2019). RESCUE: imputing dropout

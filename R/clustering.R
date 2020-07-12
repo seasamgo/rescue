@@ -4,11 +4,11 @@
 #' Construct a nearest neighbour network based on previously computed PCs
 #'
 #' @param reduced_object PC reduction matrix
-#' @param k Number of k neighbors to use
+#' @param k_neighbors Number of k neighbors to use
 #' @param minimum_shared Minimum shared neighbors
 #' @param top_shared Keep at ...
 #' @param verbose Be verbose
-#' @param ... Additional parameters
+#' @param \dots Additional parameters
 #'
 #' @return NN network as igraph object
 #'
@@ -19,7 +19,7 @@
 
 constructNN <- function(
   reduced_object,
-  k = 30,
+  k_neighbors = 30,
   minimum_shared = 5,
   top_shared = 3,
   verbose = F,
@@ -27,19 +27,22 @@ constructNN <- function(
   ) {
 
 
+  # data.table variables
+  from_cell_ID = from = to_cell_ID = to = shared = weight = distance = NULL
+
   # vector for cell_ID
   cell_names = rownames(reduced_object)
   names(cell_names) = 1:nrow(reduced_object)
 
   ## run nearest-neighbour algorithm ##
-  if(k >= nrow(reduced_object)) {
-    k = (nrow(reduced_object)-1)
+  if(k_neighbors >= nrow(reduced_object)) {
+    k_neighbors = (nrow(reduced_object)-1)
     if(verbose == TRUE) cat('\n k is too high, adjusted to nrow(matrix)-1 \n')
   }
 
-  nn_network = dbscan::kNN(x = reduced_object, k = k, sort = TRUE, ...)
+  nn_network = dbscan::kNN(x = reduced_object, k = k_neighbors, sort = TRUE, ...)
   nn_network_dt = data.table::data.table(
-    from = rep(1:nrow(nn_network$id), k),
+    from = rep(1:nrow(nn_network$id), k_neighbors),
     to = as.vector(nn_network$id),
     weight = 1/(1 + as.vector(nn_network$dist)),
     distance = as.vector(nn_network$dist)
@@ -48,9 +51,9 @@ constructNN <- function(
   nn_network_dt[, from_cell_ID := cell_names[from]]
   nn_network_dt[, to_cell_ID := cell_names[to]]
 
-  snn_network = dbscan::sNN(x = nn_network, k = k, kt = NULL, ...)
+  snn_network = dbscan::sNN(x = nn_network, k = k_neighbors, kt = NULL, ...)
   snn_network_dt = data.table::data.table(
-    from = rep(1:nrow(snn_network$id), k),
+    from = rep(1:nrow(snn_network$id), k_neighbors),
     to = as.vector(snn_network$id),
     weight = 1/(1 + as.vector(snn_network$dist)),
     distance = as.vector(snn_network$dist),
@@ -62,7 +65,7 @@ constructNN <- function(
   snn_network_dt[, to_cell_ID := cell_names[to]]
 
   # rank snn
-  setorder(snn_network_dt, from, -shared)
+  data.table::setorder(snn_network_dt, from, -shared)
   snn_network_dt[, rank := 1:.N, by = from]
 
   # filter snn
@@ -114,8 +117,21 @@ clusterLouvain <- function(
   ## check or make paths
   # python path
   if(is.null(python_path)) {
-    python_path = system('which python', intern = T)
+
+    # this will initialize python for reticulate and suggest to install miniconda if not present
+    reticulate::py_config()
+
+    if(.Platform[['OS.type']] == 'unix') {
+      python_path = try(system('which python', intern = T))
+    } else if(.Platform[['OS.type']] == 'windows') {
+      python_path = try(system('where python', intern = T))
+      if(class(python_path) == "try-error") {
+        cat('\n no python path found, set it manually when needed \n')
+        python_path = '/set/your/python/path/manually/please/'
+      }
+    }
   }
+  python_path = as.character(python_path)
 
   # prepare python path and louvain script
   reticulate::use_python(required = T, python = python_path)
@@ -131,6 +147,9 @@ clusterLouvain <- function(
 
   network_edge_dt = data.table::as.data.table(igraph::as_data_frame(x = nn_network, what = 'edges'))
 
+  # data.table variables
+  weight = NULL
+
   if(!is.null(weight_col)) {
 
     if(!weight_col %in% colnames(network_edge_dt)) {
@@ -138,7 +157,7 @@ clusterLouvain <- function(
     } else {
       # weight is defined by attribute of igraph object
       network_edge_dt = network_edge_dt[,c('from', 'to', weight_col), with = F]
-      setnames(network_edge_dt, weight_col, 'weight')
+      data.table::setnames(network_edge_dt, weight_col, 'weight')
     }
   } else {
     # weight is the same

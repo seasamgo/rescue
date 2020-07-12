@@ -4,13 +4,19 @@
 \alias{constructNN}
 \title{Nearest Network}
 \usage{
-constructNN(reduced_object, k = 30, minimum_shared = 5,
-  top_shared = 3, verbose = F, ...)
+constructNN(
+  reduced_object,
+  k_neighbors = 30,
+  minimum_shared = 5,
+  top_shared = 3,
+  verbose = F,
+  ...
+)
 }
 \arguments{
 \item{reduced_object}{PC reduction matrix}
 
-\item{k}{Number of k neighbors to use}
+\item{k_neighbors}{Number of k neighbors to use}
 
 \item{minimum_shared}{Minimum shared neighbors}
 
@@ -18,7 +24,7 @@ constructNN(reduced_object, k = 30, minimum_shared = 5,
 
 \item{verbose}{Be verbose}
 
-\item{...}{Additional parameters}
+\item{\dots}{Additional parameters}
 }
 \value{
 NN network as igraph object
