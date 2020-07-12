@@ -1,15 +1,15 @@
 Package: rescue
 Type: Package
-Title: Bootstrap imputation for single-cell RNA-seq data
-Version: 1.0.2
-Date: 2019-08-14
+Title: Bootstrap Imputation for Single-Cell RNA-Seq Data
+Version: 1.0.3
+Date: 2020-07-12
 Author: Sam Tracy & Ruben Dries
-Maintainer: Sam Tracy <stracy@g.harvard.edu>
+Maintainer: Sam Tracy <seasamgo@gmail.com>
 Description: Given a log-transformed expression matrix and list of informative genes: 
-    subsample informative genes, cluster samples using SNN clustering, estimate missing 
-    expression values with the distribution mean of means extrapolated from these cell 
-    clusterings, and return an imputed expression matrix. See Tracy, S., Yuan, G.C. and
-    Dries, R. (2019) <doi:10.1186/s12859-019-2977-0> for more details.
+    subsample informative genes, cluster samples using shared nearest neighbors clustering, 
+    estimate missing expression values with the distribution mean of means extrapolated 
+    from these cell clusterings, and return an imputed expression matrix. See Tracy, S., 
+    Yuan, G.C. and Dries, R. (2019) <doi:10.1186/s12859-019-2977-0> for more details.
 Config/reticulate:
   list(
     packages = list(

@@ -9,6 +9,7 @@ sampleImputation(
   subset_genes = NULL,
   scale_data = TRUE,
   number_pcs = 8,
+  k_neighbors = 30,
   snn_resolution = 0.9,
   impute_index = NULL,
   pseudo_zero = NULL,
@@ -24,6 +25,8 @@ sampleImputation(
 \item{scale_data}{Whether to standardize expression by gene, default TRUE}
 
 \item{number_pcs}{Number of dimensions to inform SNN clustering}
+
+\item{k_neighbors}{Number of k neighbors to use for NN network}
 
 \item{snn_resolution}{Resolution parameter for SNN}
 

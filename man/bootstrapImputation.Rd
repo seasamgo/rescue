@@ -13,6 +13,7 @@ bootstrapImputation(
   proportion_genes = 0.6,
   bootstrap_samples = 100,
   number_pcs = 8,
+  k_neighbors = 30,
   snn_resolution = 0.9,
   impute_index = NULL,
   use_mclapply = FALSE,
@@ -39,6 +40,8 @@ defaults to the most variable}
 \item{bootstrap_samples}{Number of samples for the bootstrap}
 
 \item{number_pcs}{Number of dimensions to inform SNN clustering}
+
+\item{k_neighbors}{Number of k neighbors to use for NN network}
 
 \item{snn_resolution}{Resolution parameter for SNN}
 

@@ -10,6 +10,7 @@
 #' @param subset_genes A vector of informative gene names, defaults to all genes
 #' @param scale_data Whether to standardize expression by gene, default TRUE
 #' @param number_pcs Number of dimensions to inform SNN clustering
+#' @param k_neighbors Number of k neighbors to use for NN network
 #' @param snn_resolution Resolution parameter for SNN
 #' @param impute_index Index to impute, will default to all zeroes
 #' @param pseudo_zero Pseudo-zero expression value
@@ -32,6 +33,7 @@ sampleImputation <- function(
   subset_genes = NULL,
   scale_data = TRUE,
   number_pcs = 8,
+  k_neighbors = 30,
   snn_resolution = .9,
   impute_index = NULL,
   pseudo_zero = NULL,
@@ -71,7 +73,7 @@ sampleImputation <- function(
   ## SNN ##
   if(verbose) cat('constructing nearest neighbors graph \n \n')
 
-  nn <- constructNN(reduced_object = cell_embeddings, k = 30)
+  nn <- constructNN(reduced_object = cell_embeddings, k_neighbors = k_neighbors)
 
   if(verbose) cat('clustering nearest neighbors \n \n')
 
@@ -143,6 +145,7 @@ sampleImputation <- function(
 #' @param proportion_genes Proportion of informative genes to sample
 #' @param bootstrap_samples Number of samples for the bootstrap
 #' @param number_pcs Number of dimensions to inform SNN clustering
+#' @param k_neighbors Number of k neighbors to use for NN network
 #' @param snn_resolution Resolution parameter for SNN
 #' @param impute_index Index to impute, will default to all zeroes
 #' @param use_mclapply Run in parallel, default FALSE
@@ -171,6 +174,7 @@ bootstrapImputation <- function(
   proportion_genes = 0.6,
   bootstrap_samples = 100,
   number_pcs = 8,
+  k_neighbors = 30,
   snn_resolution = .9,
   impute_index = NULL,
   use_mclapply = FALSE,
@@ -233,6 +237,7 @@ bootstrapImputation <- function(
         expression_matrix = expression_matrix,
         subset_genes = genes_to_use,
         number_pcs = number_pcs,
+        k_neighbors = k_neighbors,
         snn_resolution = snn_resolution,
         impute_index = impute_index,
         pseudo_zero = pseudo_zero,
@@ -254,6 +259,7 @@ bootstrapImputation <- function(
         expression_matrix = expression_matrix,
         subset_genes = genes_to_use,
         number_pcs = number_pcs,
+        k_neighbors = k_neighbors,
         snn_resolution = snn_resolution,
         impute_index = impute_index,
         pseudo_zero = pseudo_zero,

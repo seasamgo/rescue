@@ -4,7 +4,7 @@
 #' Construct a nearest neighbour network based on previously computed PCs
 #'
 #' @param reduced_object PC reduction matrix
-#' @param k Number of k neighbors to use
+#' @param k_neighbors Number of k neighbors to use
 #' @param minimum_shared Minimum shared neighbors
 #' @param top_shared Keep at ...
 #' @param verbose Be verbose
@@ -19,7 +19,7 @@
 
 constructNN <- function(
   reduced_object,
-  k = 30,
+  k_neighbors = 30,
   minimum_shared = 5,
   top_shared = 3,
   verbose = F,
@@ -35,14 +35,14 @@ constructNN <- function(
   names(cell_names) = 1:nrow(reduced_object)
 
   ## run nearest-neighbour algorithm ##
-  if(k >= nrow(reduced_object)) {
-    k = (nrow(reduced_object)-1)
+  if(k_neighbors >= nrow(reduced_object)) {
+    k_neighbors = (nrow(reduced_object)-1)
     if(verbose == TRUE) cat('\n k is too high, adjusted to nrow(matrix)-1 \n')
   }
 
-  nn_network = dbscan::kNN(x = reduced_object, k = k, sort = TRUE, ...)
+  nn_network = dbscan::kNN(x = reduced_object, k = k_neighbors, sort = TRUE, ...)
   nn_network_dt = data.table::data.table(
-    from = rep(1:nrow(nn_network$id), k),
+    from = rep(1:nrow(nn_network$id), k_neighbors),
     to = as.vector(nn_network$id),
     weight = 1/(1 + as.vector(nn_network$dist)),
     distance = as.vector(nn_network$dist)
@@ -51,9 +51,9 @@ constructNN <- function(
   nn_network_dt[, from_cell_ID := cell_names[from]]
   nn_network_dt[, to_cell_ID := cell_names[to]]
 
-  snn_network = dbscan::sNN(x = nn_network, k = k, kt = NULL, ...)
+  snn_network = dbscan::sNN(x = nn_network, k = k_neighbors, kt = NULL, ...)
   snn_network_dt = data.table::data.table(
-    from = rep(1:nrow(snn_network$id), k),
+    from = rep(1:nrow(snn_network$id), k_neighbors),
     to = as.vector(snn_network$id),
     weight = 1/(1 + as.vector(snn_network$dist)),
     distance = as.vector(snn_network$dist),
