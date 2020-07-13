@@ -57,7 +57,7 @@ sampleImputation <- function(
 
   ##  STANDARDIZE  ##
   if(verbose) cat('standardizing data \n \n')
-  my_small_matrix_scaled <- Matrix::t(scale(Matrix::t(my_small_matrix), center = T, scale = T))
+  my_small_matrix_scaled <- Matrix::t(scale(Matrix::t(my_small_matrix), center = TRUE, scale = TRUE))
 
 
   ##  PCA  ##
@@ -230,7 +230,7 @@ bootstrapImputation <- function(
 
       FUN = function(round) {
 
-      gene_sample <- sample(x = 1:total_number_of_genes, size = number_of_genes_to_use, replace = F)
+      gene_sample <- sample(x = 1:total_number_of_genes, size = number_of_genes_to_use, replace = FALSE)
       genes_to_use <- select_genes[gene_sample]
 
       temp_impute <- sampleImputation(
@@ -252,7 +252,7 @@ bootstrapImputation <- function(
     result_list <- list()
     for(round in 1:bootstrap_samples) {
 
-      gene_sample  = sample(x = 1:total_number_of_genes, size = number_of_genes_to_use, replace = F)
+      gene_sample  = sample(x = 1:total_number_of_genes, size = number_of_genes_to_use, replace = FALSE)
       genes_to_use = select_genes[gene_sample]
 
       temp_impute = sampleImputation(

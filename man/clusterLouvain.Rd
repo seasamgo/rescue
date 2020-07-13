@@ -9,8 +9,8 @@ clusterLouvain(
   python_path = NULL,
   resolution = 1,
   weight_col = NULL,
-  louv_random = F,
-  set_seed = T,
+  louv_random = FALSE,
+  set_seed = TRUE,
   seed_number = 0,
   ...
 )
@@ -37,9 +37,4 @@ A character vector of cluster labels
 }
 \description{
 Cluster cells using a NN-network and the Louvain algorithm from the community module in Python
-}
-\examples{
-\dontrun{
-clusterLouvain(nn_network)
-}
 }

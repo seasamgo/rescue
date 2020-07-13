@@ -6,7 +6,7 @@
 \usage{
 computeHVG(
   expression_matrix,
-  reverse_log_scale = T,
+  reverse_log_scale = TRUE,
   log_base = exp(1),
   expression_threshold = 0,
   nr_expression_groups = 20,

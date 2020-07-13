@@ -12,17 +12,13 @@
 #'
 #' @return NN network as igraph object
 #'
-#' @examples
-#' \dontrun{
-#' constructNN(reduced_object)
-#' }
 
 constructNN <- function(
   reduced_object,
   k_neighbors = 30,
   minimum_shared = 5,
   top_shared = 3,
-  verbose = F,
+  verbose = FALSE,
   ...
   ) {
 
@@ -37,7 +33,7 @@ constructNN <- function(
   ## run nearest-neighbour algorithm ##
   if(k_neighbors >= nrow(reduced_object)) {
     k_neighbors = (nrow(reduced_object)-1)
-    if(verbose == TRUE) cat('\n k is too high, adjusted to nrow(matrix)-1 \n')
+    if(verbose) cat('\n k is too high, adjusted to nrow(matrix)-1 \n')
   }
 
   nn_network = dbscan::kNN(x = reduced_object, k = k_neighbors, sort = TRUE, ...)
@@ -97,18 +93,14 @@ constructNN <- function(
 #'
 #' @return A character vector of cluster labels
 #'
-#' @examples
-#' \dontrun{
-#' clusterLouvain(nn_network)
-#' }
 
 clusterLouvain <- function(
   nn_network,
   python_path = NULL,
   resolution = 1,
   weight_col = NULL,
-  louv_random = F,
-  set_seed = T,
+  louv_random = FALSE,
+  set_seed = TRUE,
   seed_number = 0,
   ...
   ) {
@@ -122,9 +114,9 @@ clusterLouvain <- function(
     reticulate::py_config()
 
     if(.Platform[['OS.type']] == 'unix') {
-      python_path = try(system('which python', intern = T))
+      python_path = try(system('which python', intern = TRUE))
     } else if(.Platform[['OS.type']] == 'windows') {
-      python_path = try(system('where python', intern = T))
+      python_path = try(system('where python', intern = TRUE))
       if(class(python_path) == "try-error") {
         cat('\n no python path found, set it manually when needed \n')
         python_path = '/set/your/python/path/manually/please/'
@@ -134,7 +126,7 @@ clusterLouvain <- function(
   python_path = as.character(python_path)
 
   # prepare python path and louvain script
-  reticulate::use_python(required = T, python = python_path)
+  reticulate::use_python(required = TRUE, python = python_path)
   python_louvain_function = system.file("python", "python_louvain.py", package = 'rescue')
   reticulate::source_python(file = python_louvain_function)
 
@@ -156,19 +148,19 @@ clusterLouvain <- function(
       stop('\n weight column is not an igraph attribute \n')
     } else {
       # weight is defined by attribute of igraph object
-      network_edge_dt = network_edge_dt[,c('from', 'to', weight_col), with = F]
+      network_edge_dt = network_edge_dt[,c('from', 'to', weight_col), with = FALSE]
       data.table::setnames(network_edge_dt, weight_col, 'weight')
     }
   } else {
     # weight is the same
-    network_edge_dt = network_edge_dt[,c('from', 'to'), with = F]
+    network_edge_dt = network_edge_dt[,c('from', 'to'), with = FALSE]
     network_edge_dt[, weight := 1]
   }
 
   # do python louvain clustering
   if(louv_random == FALSE) {
     reticulate::py_set_seed(seed = seed_number, disable_hash_randomization = TRUE)
-    pyth_louv_result = python_louvain(df = network_edge_dt, resolution = resolution, randomize = F)
+    pyth_louv_result = python_louvain(df = network_edge_dt, resolution = resolution, randomize = FALSE)
   } else {
     reticulate::py_set_seed(seed = seed_number, disable_hash_randomization = TRUE)
     pyth_louv_result = python_louvain(df = network_edge_dt, resolution = resolution, random_state = seed_number)

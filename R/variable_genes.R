@@ -19,7 +19,7 @@
 
 computeHVG <- function(
   expression_matrix,
-  reverse_log_scale = T,
+  reverse_log_scale = TRUE,
   log_base = exp(1),
   expression_threshold = 0,
   nr_expression_groups = 20,
@@ -50,7 +50,7 @@ computeHVG <- function(
   prob_sequence[length(prob_sequence)] = 1
   expr_group_breaks = stats::quantile(gene_in_cells_detected$mean_expr, probs = prob_sequence)
 
-  gene_in_cells_detected[, expr_groups := cut(x = gene_in_cells_detected$mean_expr, breaks = expr_group_breaks, labels = paste0('group_', 1:nr_expression_groups), include.lowest = T)]
+  gene_in_cells_detected[, expr_groups := cut(x = gene_in_cells_detected$mean_expr, breaks = expr_group_breaks, labels = paste0('group_', 1:nr_expression_groups), include.lowest = TRUE)]
   gene_in_cells_detected[, cov_group_zscore := scale(covariance), by = expr_groups]
   gene_in_cells_detected[, selected := ifelse(cov_group_zscore > zscore_threshold, 'yes', 'no')]
 

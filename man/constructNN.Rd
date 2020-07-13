@@ -9,7 +9,7 @@ constructNN(
   k_neighbors = 30,
   minimum_shared = 5,
   top_shared = 3,
-  verbose = F,
+  verbose = FALSE,
   ...
 )
 }
@@ -31,9 +31,4 @@ NN network as igraph object
 }
 \description{
 Construct a nearest neighbour network based on previously computed PCs
-}
-\examples{
-\dontrun{
-constructNN(reduced_object)
-}
 }
