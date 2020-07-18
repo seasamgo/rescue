@@ -38,8 +38,3 @@ A character vector of cluster labels
 \description{
 Cluster cells using a NN-network and the Louvain algorithm from the community module in Python
 }
-\examples{
-\dontrun{
-clusterLouvain(nn_network)
-}
-}

@@ -10,12 +10,10 @@
 #' @param verbose Be verbose
 #' @param \dots Additional parameters
 #'
+#' @importFrom data.table := .N
+#'
 #' @return NN network as igraph object
 #'
-#' @examples
-#' \dontrun{
-#' constructNN(reduced_object)
-#' }
 
 constructNN <- function(
   reduced_object,
@@ -95,12 +93,10 @@ constructNN <- function(
 #' @param seed_number Number for seed
 #' @param ... Additional parameters
 #'
+#' @importFrom data.table :=
+#'
 #' @return A character vector of cluster labels
 #'
-#' @examples
-#' \dontrun{
-#' clusterLouvain(nn_network)
-#' }
 
 clusterLouvain <- function(
   nn_network,

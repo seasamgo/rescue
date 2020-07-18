@@ -33,7 +33,26 @@ Character vector of highly variable genes
 Compute Highly Variable Genes
 }
 \examples{
-\dontrun{
-computeHVG(expression_matrix)
-}
+set.seed(0)
+requireNamespace("Matrix")
+
+## generate (meaningless) counts
+c1 <- stats::rpois(5e3, 1)
+c2 <- stats::rpois(5e3, 2)
+m <- t(
+  rbind(
+    matrix(c1, nrow = 20),
+    matrix(c2, nrow = 20)
+  )
+)
+
+## construct an expression matrix m
+colnames(m) <- paste0('cell', 1:ncol(m))
+rownames(m) <- paste0('gene', 1:nrow(m))
+m <- log(m/colSums(m)*1e4 + 1)
+m <- methods::as(m, 'dgCMatrix')
+
+## calculate HVGs
+hvgs <- computeHVG(m)
+
 }

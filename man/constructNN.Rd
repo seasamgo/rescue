@@ -32,8 +32,3 @@ NN network as igraph object
 \description{
 Construct a nearest neighbour network based on previously computed PCs
 }
-\examples{
-\dontrun{
-constructNN(reduced_object)
-}
-}
