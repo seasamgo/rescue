@@ -3,3 +3,5 @@
 export(bootstrapImputation)
 export(computeHVG)
 export(sampleImputation)
+importFrom(data.table,":=")
+importFrom(data.table,.N)

@@ -65,8 +65,33 @@ Subsample informative genes, cluster cells using SNN, estimate missing expressio
 values with the distribution mean of means extrapolated from these cell clusterings
 }
 \examples{
-\dontrun{
-bootstrapImputation(expression_matrix)
+set.seed(0)
+requireNamespace("Matrix")
+
+## generate (meaningless) counts
+c1 <- stats::rpois(5e3, 1)
+c2 <- stats::rpois(5e3, 2)
+m <- t(
+  rbind(
+    matrix(c1, nrow = 20),
+    matrix(c2, nrow = 20)
+  )
+)
+
+## construct an expression matrix m
+colnames(m) <- paste0('cell', 1:ncol(m))
+rownames(m) <- paste0('gene', 1:nrow(m))
+m <- log(m/colSums(m)*1e4 + 1)
+m <- methods::as(m, 'dgCMatrix')
+
+## impute
+\donttest{
+m_imputed <- rescue::bootstrapImputation(
+  expression_matrix = m,
+  proportion_genes = .9,
+  bootstrap_samples = 2,
+  k_neighbors = 10
+)
 }
 
 }

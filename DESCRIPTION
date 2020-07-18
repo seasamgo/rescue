@@ -2,7 +2,7 @@ Package: rescue
 Type: Package
 Title: Bootstrap Imputation for Single-Cell RNA-Seq Data
 Version: 1.0.3
-Date: 2020-07-12
+Date: 2020-07-15
 Author: Sam Tracy & Ruben Dries
 Maintainer: Sam Tracy <seasamgo@gmail.com>
 Description: Given a log-transformed expression matrix and list of informative genes: 
@@ -35,6 +35,7 @@ LazyData: FALSE
 URL: https://github.com/seasamgo/rescue
 BugReports: http://github.com/seasamgo/rescue/issues
 RoxygenNote: 7.1.1
+Encoding: UTF-8
 Suggests:
     knitr,
     rmarkdown

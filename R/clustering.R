@@ -10,6 +10,8 @@
 #' @param verbose Be verbose
 #' @param \dots Additional parameters
 #'
+#' @importFrom data.table := .N
+#'
 #' @return NN network as igraph object
 #'
 
@@ -90,6 +92,8 @@ constructNN <- function(
 #' @param set_seed Set seed
 #' @param seed_number Number for seed
 #' @param ... Additional parameters
+#'
+#' @importFrom data.table :=
 #'
 #' @return A character vector of cluster labels
 #'
